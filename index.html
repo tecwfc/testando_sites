@@ -97,7 +97,6 @@
       box-shadow: 0 6px 14px rgba(11, 110, 58, 0.3);
     }
 
-    /* Botão + apenas no mobile */
     .btn-add-mobile {
       width: 36px;
       height: 36px;
@@ -159,13 +158,11 @@
       0% {
         background-position: -200% 0;
       }
-
       100% {
         background-position: 200% 0;
       }
     }
 
-    /* PDF style - ordem: ITEM, PRODUTO, QUANTIDADE, TIPO, PREÇO UNIT., TOTAL */
     .pdf-container {
       font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
       padding: 28px 32px;
@@ -308,29 +305,23 @@
       body {
         background: #f3faf5;
       }
-
       .glass {
         backdrop-filter: blur(6px);
       }
-
       .product-card {
         border-radius: 14px;
         padding: 12px !important;
       }
-
       .btn-primary {
         padding: 0.3rem 0.8rem;
         font-size: 0.75rem;
       }
-
       .pdf-container {
         padding: 16px 12px;
       }
-
       .pdf-table {
         font-size: 8px;
       }
-
       .pdf-table thead th,
       .pdf-table tbody td {
         padding: 4px 3px;
@@ -346,29 +337,25 @@
 
 <body class="min-h-screen flex flex-col">
 
-  <!-- HEADER ecom -->
+  <!-- HEADER -->
   <header id="mainHeader" class="fixed top-3 left-1/2 -translate-x-1/2 w-[min(820px,96%)] z-50">
     <div class="glass rounded-3xl px-5 py-3 flex items-center justify-between shadow-ecom">
       <div class="flex items-center gap-4">
-        <div
-          class="w-11 h-11 flex items-center justify-center rounded-full overflow-hidden border-2 border-white/80 shadow-sm bg-white">
+        <div class="w-11 h-11 flex items-center justify-center rounded-full overflow-hidden border-2 border-white/80 shadow-sm bg-white">
           <img src="assets/papel ivo preto png.png" alt="Ivo Pita" class="w-full h-full object-cover" />
         </div>
         <div class="flex items-center gap-2 border-l border-gray-300/60 pl-4">
           <span class="text-sm font-bold text-gray-800 tracking-tight">Ivo Pita</span>
           <span class="badge-green">indústria</span>
           <button id="themeToggle" title="Alternar tema" class="p-1.5 rounded-full hover:bg-black/5 transition ml-1">
-            <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-800" viewBox="0 0 24 24"
-              fill="currentColor">
-              <path
-                d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42M12 7a5 5 0 100 10 5 5 0 000-10z" />
+            <svg id="themeIcon" xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-green-800" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M12 3v2M12 19v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42M12 7a5 5 0 100 10 5 5 0 000-10z" />
             </svg>
           </button>
         </div>
       </div>
       <div class="flex items-center gap-2">
-        <span
-          class="text-xs font-medium text-green-700 bg-green-50/80 px-3 py-1 rounded-full border border-green-200/60">GLGA</span>
+        <span class="text-xs font-medium text-green-700 bg-green-50/80 px-3 py-1 rounded-full border border-green-200/60">GLGA</span>
       </div>
     </div>
   </header>
@@ -377,10 +364,9 @@
     <div class="w-[min(820px,96%)]">
       <div class="grid grid-cols-1 gap-8">
 
-        <!-- SEÇÃO PRODUTOS + CARRINHO (layout ecom) -->
         <div class="grid grid-cols-1 md:grid-cols-5 gap-6">
 
-          <!-- Produtos (3/5) -->
+          <!-- Produtos -->
           <div class="md:col-span-3 space-y-5">
             <div class="glass rounded-3xl p-6 shadow-ecom">
               <div class="flex items-center justify-between mb-4">
@@ -394,9 +380,7 @@
                 <label class="text-sm font-semibold text-gray-700 flex items-center gap-2">
                   <span>📅 Pedido</span>
                 </label>
-                <input id="orderDate" type="date"
-                  class="w-full mt-1 px-4 py-3 rounded-2xl border border-gray-200 bg-white/80 focus:ring-2 focus:ring-green-300 focus:border-green-400 outline-none transition"
-                  required />
+                <input id="orderDate" type="date" class="w-full mt-1 px-4 py-3 rounded-2xl border border-gray-200 bg-white/80 focus:ring-2 focus:ring-green-300 focus:border-green-400 outline-none transition" required />
               </div>
 
               <div id="formSkeleton" class="space-y-3">
@@ -414,20 +398,18 @@
             </div>
           </div>
 
-          <!-- Carrinho (2/5) -->
+          <!-- Carrinho -->
           <div class="md:col-span-2 space-y-5">
             <div class="glass rounded-3xl p-6 shadow-ecom sticky top-28">
               <div class="flex items-center justify-between mb-3">
                 <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
                   <span>🛒</span> Carrinho
                 </h2>
-                <span id="cartCount"
-                  class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">0</span>
+                <span id="cartCount" class="bg-green-100 text-green-800 text-xs font-bold px-3 py-1 rounded-full">0</span>
               </div>
 
               <div id="cartContainer" class="mt-1 max-h-64 overflow-y-auto">
-                <div id="noCartItems" class="text-center text-gray-400 py-6 text-sm italic">Seu carrinho está vazio
-                </div>
+                <div id="noCartItems" class="text-center text-gray-400 py-6 text-sm italic">Seu carrinho está vazio</div>
               </div>
 
               <div id="cartSummary" class="mt-4 pt-4 border-t border-green-100 hidden">
@@ -445,20 +427,16 @@
                 </div>
 
                 <div class="mt-4 space-y-2">
-                  <button id="generateCartPDFBtn"
-                    class="w-full btn-primary py-2.5 text-sm flex items-center justify-center gap-2">
+                  <button id="generateCartPDFBtn" class="w-full btn-primary py-2.5 text-sm flex items-center justify-center gap-2">
                     📄 Gerar PDF
                   </button>
-                  <button id="sendWhatsAppBtn"
-                    class="w-full bg-[#25D366] hover:bg-[#1ebe5c] text-white font-semibold py-2.5 rounded-full text-sm flex items-center justify-center gap-2 transition shadow-sm">
+                  <button id="sendWhatsAppBtn" class="w-full bg-[#25D366] hover:bg-[#1ebe5c] text-white font-semibold py-2.5 rounded-full text-sm flex items-center justify-center gap-2 transition shadow-sm">
                     <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path
-                        d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.411-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.411-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z" />
                     </svg>
                     WhatsApp
                   </button>
-                  <button id="clearCartBtn"
-                    class="w-full text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-full py-2 font-medium transition">
+                  <button id="clearCartBtn" class="w-full text-sm text-red-600 bg-red-50 hover:bg-red-100 rounded-full py-2 font-medium transition">
                     Limpar carrinho
                   </button>
                 </div>
@@ -470,7 +448,7 @@
     </div>
   </main>
 
-  <!-- PDF oculto - ordem: ITEM, PRODUTO, QUANTIDADE, TIPO, PREÇO UNIT., TOTAL -->
+  <!-- PDF oculto -->
   <div id="pdfContent" class="hidden pdf-container">
     <div class="pdf-header">
       <div class="company-name">Ivo Pita Indústria</div>
@@ -508,30 +486,18 @@
         </tfoot>
       </table>
     </div>
-
-    <!-- <div class="pdf-footer">
-        <span>📧 ivo.pita@industria.com</span>
-        <span>🔹 Documento gerado automaticamente</span>
-      </div> -->
   </div>
 
   <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js">
   </script>
 
   <script>
-    // ---------- CONFIG ----------
-    // const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsAXctMIiQ3wewGMWRTpX-JhfMRCXoWS-ek_8SpSsmFK1htwT-ZWDOnQ-SX3b5eIuD-g/exec";
-  //  const CART_STORAGE_KEY = "glga_ivo_cart_items";
-
-// ============================================
-// CONFIGURAÇÃO DO SUPABASE
-// ============================================
-const SUPABASE_URL = "https://pshijarnndbbmpspxinm.supabase.co";
-const SUPABASE_KEY = "pshijarnndbbmpspxinm";
-
-// REMOVA ou COMENTE esta linha:
-// const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwsAXctMIiQ3wewGMWRTpX-JhfMRCXoWS-ek_8SpSsmFK1htwT-ZWDOnQ-SX3b5eIuD-g/exec";
-
+    // ============================================
+    // CONFIGURAÇÃO
+    // ============================================
+    const SUPABASE_URL = "https://pshijarnndbbmpspxinm.supabase.co";
+    const SUPABASE_KEY = "pshijarnndbbmpspxinm";
+    const CART_STORAGE_KEY = "glga_ivo_cart_items";
 
     // DADOS DE EXEMPLO (fallback)
     const SAMPLE_PRODUCTS = [
@@ -545,6 +511,70 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       { description: "Sulfato de Alumínio", price: 33.40, type: "Químico" }
     ];
 
+    // ============================================
+    // FUNÇÃO PARA SALVAR NO SUPABASE (CORRIGIDA - AGORA NO INÍCIO)
+    // ============================================
+    async function salvarPedidoNoSupabase(itens, quantidadeTotal, valorTotal) {
+      try {
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // 1. Criar o pedido
+        const dadosPedido = {
+          numero_pedido: `PED-${String(pedidoCounter).padStart(4, '0')}`,
+          data_pedido: orderDate.value || new Date().toISOString().split('T')[0],
+          quantidade_total: quantidadeTotal,
+          valor_total: valorTotal,
+          status: 'pendente'
+        };
+
+        console.log('📤 Enviando pedido:', dadosPedido);
+
+        const { data: pedido, error: erroPedido } = await supabase
+          .from('pedidos')
+          .insert(dadosPedido)
+          .select()
+          .single();
+
+        if (erroPedido) {
+          console.error('❌ Erro ao criar pedido:', erroPedido);
+          throw erroPedido;
+        }
+
+        console.log('✅ Pedido criado:', pedido);
+
+        // 2. Salvar itens do pedido
+        const itensPedido = itens.map(item => ({
+          pedido_id: pedido.id,
+          produto_descricao: item.description,
+          produto_tipo: item.type || '',
+          quantidade: item.quantity,
+          preco_unitario: item.price || 0,
+          subtotal: (item.quantity * item.price) || 0
+        }));
+
+        console.log('📤 Enviando itens:', itensPedido);
+
+        const { error: erroItens } = await supabase
+          .from('itens_pedido')
+          .insert(itensPedido);
+
+        if (erroItens) {
+          console.error('❌ Erro ao salvar itens:', erroItens);
+          throw erroItens;
+        }
+
+        console.log('✅ Pedido salvo com sucesso! ID:', pedido.id);
+        return { success: true, pedidoId: pedido.id };
+
+      } catch (err) {
+        console.error('❌ Erro completo:', err);
+        return { success: false, error: err.message };
+      }
+    }
+
+    // ============================================
+    // VARIÁVEIS GLOBAIS
+    // ============================================
     const orderDate = document.getElementById("orderDate");
     const messageBox = document.getElementById("messageBox");
     const formSkeleton = document.getElementById("formSkeleton");
@@ -574,6 +604,7 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
     const themeToggle = document.getElementById("themeToggle");
     const themeIcon = document.getElementById("themeIcon");
     const body = document.body;
+
     function applyTheme(theme) {
       if (theme === "dark") {
         body.classList.add("dark");
@@ -588,6 +619,7 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       }
       localStorage.setItem("ui-theme", theme);
     }
+
     (function initTheme() {
       const saved = localStorage.getItem("ui-theme") || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
       applyTheme(saved);
@@ -597,10 +629,16 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       });
     })();
 
-    // ---------- HELPERS ----------
-    function loadCart() { try { return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]"); } catch { return []; } }
+    // ============================================
+    // HELPERS
+    // ============================================
+    function loadCart() {
+      try { return JSON.parse(localStorage.getItem(CART_STORAGE_KEY) || "[]"); } catch { return []; }
+    }
 
-    function saveCart() { localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart)); }
+    function saveCart() {
+      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+    }
 
     function showMsg(text, type = "success") {
       messageBox.textContent = text;
@@ -609,13 +647,21 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       setTimeout(() => messageBox.classList.add("hidden"), 3500);
     }
 
-    function escapeHtml(s) { return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;"); }
+    function escapeHtml(s) {
+      return String(s).replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
+    }
 
-    function escapeAttr(s) { return String(s).replaceAll('"', "&quot;").replaceAll("'", "&#39;"); }
+    function escapeAttr(s) {
+      return String(s).replaceAll('"', "&quot;").replaceAll("'", "&#39;");
+    }
 
-    function formatDate(iso) { try { const [y, m, d] = iso.split("-"); return `${d}/${m}/${y}`; } catch { return iso; } }
+    function formatDate(iso) {
+      try { const [y, m, d] = iso.split("-"); return `${d}/${m}/${y}`; } catch { return iso; }
+    }
 
-    function formatNumberToLocal(num) { return (Number(num) || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+    function formatNumberToLocal(num) {
+      return (Number(num) || 0).toLocaleString("pt-BR", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
 
     function parsePrice(priceStr) {
       if (!priceStr) return 0;
@@ -625,7 +671,9 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       return isNaN(num) ? 0 : num;
     }
 
-    // ---------- RENDER CARRINHO ----------
+    // ============================================
+    // RENDER CARRINHO
+    // ============================================
     function renderCart() {
       cartContainer.innerHTML = "";
       const validCart = cart.filter(item => item.quantity > 0);
@@ -649,13 +697,13 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       const table = document.createElement("table");
       table.className = "w-full text-sm";
       table.innerHTML = `
-              <thead class="text-gray-500 text-xs border-b border-green-100"><tr>
-                <th class="text-left py-1 font-medium">Produto</th>
-                <th class="text-center py-1 font-medium">Qtd</th>
-                <th class="text-right py-1 font-medium">Ação</th>
-              </tr></thead>
-              <tbody></tbody>
-            `;
+        <thead class="text-gray-500 text-xs border-b border-green-100"><tr>
+          <th class="text-left py-1 font-medium">Produto</th>
+          <th class="text-center py-1 font-medium">Qtd</th>
+          <th class="text-right py-1 font-medium">Ação</th>
+        </tr></thead>
+        <tbody></tbody>
+      `;
       const tbody = table.querySelector("tbody");
 
       validCart.forEach((item, idx) => {
@@ -663,19 +711,19 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
         const tr = document.createElement("tr");
         tr.className = "border-b border-gray-100/80";
         tr.innerHTML = `
-                <td class="py-2"><div class="font-medium text-gray-800">${escapeHtml(item.description)}</div>
-                  <div class="text-xs text-gray-400">${item.type ? escapeHtml(item.type) : ""} · R$ ${formatNumberToLocal(item.price)}</div></td>
-                <td class="text-center py-2">
-                  <div class="flex items-center justify-center gap-1">
-                    <button class="qty-btn-minus w-6 h-6 rounded-full bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center text-sm font-bold" data-index="${originalIndex}">−</button>
-                    <span class="qty-display font-semibold text-gray-700 w-8 text-center">${formatNumberToLocal(item.quantity)}</span>
-                    <button class="qty-btn-plus w-6 h-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100 flex items-center justify-center text-sm font-bold" data-index="${originalIndex}">+</button>
-                  </div>
-                </td>
-                <td class="text-right py-2">
-                  <button class="remove-cart-btn text-red-400 hover:text-red-600 text-xs font-medium" data-index="${originalIndex}">✕</button>
-                </td>
-              `;
+          <td class="py-2"><div class="font-medium text-gray-800">${escapeHtml(item.description)}</div>
+            <div class="text-xs text-gray-400">${item.type ? escapeHtml(item.type) : ""} · R$ ${formatNumberToLocal(item.price)}</div></td>
+          <td class="text-center py-2">
+            <div class="flex items-center justify-center gap-1">
+              <button class="qty-btn-minus w-6 h-6 rounded-full bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center text-sm font-bold" data-index="${originalIndex}">−</button>
+              <span class="qty-display font-semibold text-gray-700 w-8 text-center">${formatNumberToLocal(item.quantity)}</span>
+              <button class="qty-btn-plus w-6 h-6 rounded-full bg-green-50 text-green-600 hover:bg-green-100 flex items-center justify-center text-sm font-bold" data-index="${originalIndex}">+</button>
+            </div>
+          </td>
+          <td class="text-right py-2">
+            <button class="remove-cart-btn text-red-400 hover:text-red-600 text-xs font-medium" data-index="${originalIndex}">✕</button>
+          </td>
+        `;
         tbody.appendChild(tr);
 
         const btnPlus = tr.querySelector(".qty-btn-plus");
@@ -711,7 +759,8 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
     function addToCart(desc, type, price, qty = 1) {
       const idx = cart.findIndex(i => i.description === desc);
       if (idx !== -1) {
-        cart[idx].quantity += qty; if (price !== undefined) cart[idx].price = price;
+        cart[idx].quantity += qty;
+        if (price !== undefined) cart[idx].price = price;
         showMsg(`+${formatNumberToLocal(qty)} ${desc}`, "info");
       } else {
         cart.push({ description: desc, type: type || "", quantity: qty, price: price || 0 });
@@ -741,7 +790,9 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       });
     }
 
-    // ---------- POPULAR PRODUTOS ----------
+    // ============================================
+    // POPULAR PRODUTOS
+    // ============================================
     function populateProductList() {
       productListEl.innerHTML = "";
       if (!products || !products.length) {
@@ -758,22 +809,22 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
 
         const hasPrice = p.price > 0;
         card.innerHTML = `
-                <div class="flex-1 min-w-0">
-                  <div class="font-semibold text-gray-800 text-sm truncate">${escapeHtml(p.description)}</div>
-                  <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-                    <span class="text-xs text-gray-500">${p.type ? escapeHtml(p.type) : ""}</span>
-                    ${hasPrice ? `<span class="text-xs font-bold text-green-700">R$ ${formatNumberToLocal(p.price)}</span>` : '<span class="text-xs text-gray-400">—</span>'}
-                  </div>
-                </div>
-                <div class="flex items-center gap-2">
-                  <span class="qty-indicator qty-pill ${qty > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}">${qty > 0 ? formatNumberToLocal(qty) : "0"}</span>
-                  <button class="add-to-cart-btn btn-add-mobile" 
-                    data-desc="${escapeAttr(p.description)}" data-type="${escapeAttr(p.type || "")}" data-price="${p.price || 0}"
-                    aria-label="Adicionar ao carrinho">
-                    +
-                  </button>
-                </div>
-              `;
+          <div class="flex-1 min-w-0">
+            <div class="font-semibold text-gray-800 text-sm truncate">${escapeHtml(p.description)}</div>
+            <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+              <span class="text-xs text-gray-500">${p.type ? escapeHtml(p.type) : ""}</span>
+              ${hasPrice ? `<span class="text-xs font-bold text-green-700">R$ ${formatNumberToLocal(p.price)}</span>` : '<span class="text-xs text-gray-400">—</span>'}
+            </div>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="qty-indicator qty-pill ${qty > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}">${qty > 0 ? formatNumberToLocal(qty) : "0"}</span>
+            <button class="add-to-cart-btn btn-add-mobile" 
+              data-desc="${escapeAttr(p.description)}" data-type="${escapeAttr(p.type || "")}" data-price="${p.price || 0}"
+              aria-label="Adicionar ao carrinho">
+              +
+            </button>
+          </div>
+        `;
         productListEl.appendChild(card);
         card.querySelector(".add-to-cart-btn").addEventListener("click", (e) => {
           e.stopPropagation();
@@ -785,67 +836,87 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       });
     }
 
-    // ---------- FETCH PRODUTOS ----------
+    // ============================================
+    // FETCH PRODUTOS
+    // ============================================
     async function fetchProducts() {
-  formSkeleton.classList.remove("hidden");
-  productSelectionSection.classList.add("hidden");
-  productListEl.innerHTML = '<div class="text-sm text-gray-400 p-3">Carregando produtos...</div>';
-  
-  try {
-    // Inicializar Supabase
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    const { data, error } = await supabase
-      .from('produtos')
-      .select('*')
-      .order('descricao');
-    
-    if (error) throw error;
-    
-    if (data && data.length > 0) {
-      products = data.map(p => ({
-        description: p.descricao || '',
-        price: parseFloat(p.preco) || 0,
-        type: p.tipo || ''
-      }));
-      showMsg(`✅ ${products.length} produtos carregados do Supabase!`, "success");
-    } else {
-      throw new Error("Nenhum produto encontrado");
-    }
-    
-  } catch (err) {
-    console.warn("Erro ao carregar do Supabase:", err);
-    // Fallback para dados locais
-    products = SAMPLE_PRODUCTS.map(p => ({
-      description: p.description,
-      price: p.price || 0,
-      type: p.type || ""
-    }));
-    showMsg("⚠️ Usando produtos de exemplo (fallback)", "info");
-  } finally {
-    formSkeleton.classList.add("hidden");
-    productSelectionSection.classList.remove("hidden");
-    populateProductList();
-    renderCart();
-  }
-}
+      formSkeleton.classList.remove("hidden");
+      productSelectionSection.classList.add("hidden");
+      productListEl.innerHTML = '<div class="text-sm text-gray-400 p-3">Carregando produtos...</div>';
 
-    // ---------- PDF ----------
-  function generatePDFFromCart() {
-  const items = cart.filter(i => i.quantity > 0);
-  if (!items.length) { showMsg("Carrinho vazio", "error"); return; }
-  
-  const totalQtd = items.reduce((s, i) => s + i.quantity, 0);
-  const totalValor = items.reduce((s, i) => s + (i.quantity * i.price), 0);
-  
-  // 🔥 SALVAR NO SUPABASE
-  salvarPedidoNoSupabase(items, totalQtd, totalValor).then(result => {
-    if (result.success) {
-      showMsg(`✅ Pedido #${pedidoCounter} salvo com sucesso!`, "success");
-    } else {
-      showMsg(`⚠️ Pedido não foi salvo no banco: ${result.error}`, "warning");
+      try {
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const { data, error } = await supabase
+          .from('produtos')
+          .select('*')
+          .order('descricao');
+
+        if (error) throw error;
+
+        if (data && data.length > 0) {
+          products = data.map(p => ({
+            description: p.descricao || '',
+            price: parseFloat(p.preco) || 0,
+            type: p.tipo || ''
+          }));
+          showMsg(`✅ ${products.length} produtos carregados do Supabase!`, "success");
+        } else {
+          throw new Error("Nenhum produto encontrado");
+        }
+
+      } catch (err) {
+        console.warn("Erro ao carregar do Supabase:", err);
+        products = SAMPLE_PRODUCTS.map(p => ({
+          description: p.description,
+          price: p.price || 0,
+          type: p.type || ""
+        }));
+        showMsg("⚠️ Usando produtos de exemplo (fallback)", "info");
+      } finally {
+        formSkeleton.classList.add("hidden");
+        productSelectionSection.classList.remove("hidden");
+        populateProductList();
+        renderCart();
+      }
     }
-  
+
+    // ============================================
+    // GERAR PDF (CORRIGIDA)
+    // ============================================
+    function generatePDFFromCart() {
+      const items = cart.filter(i => i.quantity > 0);
+      if (!items.length) {
+        showMsg("Carrinho vazio", "error");
+        return;
+      }
+
+      const totalQtd = items.reduce((s, i) => s + i.quantity, 0);
+      const totalValor = items.reduce((s, i) => s + (i.quantity * i.price), 0);
+
+      // 🔥 SALVAR NO SUPABASE
+      salvarPedidoNoSupabase(items, totalQtd, totalValor).then(result => {
+        if (result.success) {
+          showMsg(`✅ Pedido #${pedidoCounter} salvo com sucesso!`, "success");
+        } else {
+          showMsg(`⚠️ Pedido não foi salvo no banco: ${result.error}`, "warning");
+        }
+      });
+
+      // --- GERAR PDF ---
+      pdfTableBody.innerHTML = "";
+
+      items.forEach((o, i) => {
+        const tr = document.createElement("tr");
+        const subtotal = o.quantity * o.price;
+        tr.innerHTML = `
+          <td>${String(i + 1).padStart(2, '0')}</td>
+          <td class="text-left product-name">${escapeHtml(o.description)}</td>
+          <td><strong>${formatNumberToLocal(o.quantity)}</strong></td>
+          <td>${o.type ? o.type.substring(0, 8) : "---"}</td>
+          <td class="price-cell">${o.price > 0 ? "R$ " + formatNumberToLocal(o.price) : "-"}</td>
+          <td class="total-cell">${o.price > 0 ? "R$ " + formatNumberToLocal(subtotal) : "-"}</td>
+        `;
         pdfTableBody.appendChild(tr);
       });
 
@@ -884,10 +955,15 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       }, 400);
     }
 
-    // ---------- WHATSAPP ----------
+    // ============================================
+    // WHATSAPP
+    // ============================================
     document.getElementById("sendWhatsAppBtn").addEventListener("click", () => {
       const items = cart.filter(i => i.quantity > 0);
-      if (!items.length) { showMsg("Carrinho vazio", "error"); return; }
+      if (!items.length) {
+        showMsg("Carrinho vazio", "error");
+        return;
+      }
       let msg = `*📋 PEDIDO GLGA - IVO PITA INDÚSTRIA*\nPedido: #${String(pedidoCounter).padStart(3, '0')}\nData: ${formatDate(orderDate.value)}\n━━━━━━━━━━━━━━━━━━━━\n`;
       items.forEach((item, idx) => {
         const sub = (item.quantity * item.price);
@@ -899,7 +975,9 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`, "_blank");
     });
 
-    // ---------- EVENTOS ----------
+    // ============================================
+    // EVENTOS
+    // ============================================
     generateCartPDFBtn.addEventListener("click", generatePDFFromCart);
     clearCartBtn.addEventListener("click", () => {
       if (confirm("Limpar carrinho?")) {
@@ -911,63 +989,9 @@ const SUPABASE_KEY = "pshijarnndbbmpspxinm";
       }
     });
 
-
-// ============================================
-// FUNÇÃO PARA SALVAR NO SUPABASE
-// ============================================
-async function salvarPedidoNoSupabase(itens, quantidadeTotal, valorTotal) {
-  try {
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    
-    // 1. Criar o pedido
-    const dadosPedido = {
-      numero_pedido: `PED-${String(pedidoCounter).padStart(4, '0')}`,
-      data_pedido: orderDate.value || new Date().toISOString().split('T')[0],
-      quantidade_total: quantidadeTotal,
-      valor_total: valorTotal,
-      status: 'pendente'
-    };
-    
-    const { data: pedido, error: erroPedido } = await supabase
-      .from('pedidos')
-      .insert(dadosPedido)
-      .select()
-      .single();
-    
-    if (erroPedido) throw erroPedido;
-    
-    // 2. Salvar itens do pedido
-    const itensPedido = itens.map(item => ({
-      pedido_id: pedido.id,
-      produto_descricao: item.description,
-      produto_tipo: item.type || '',
-      quantidade: item.quantity,
-      preco_unitario: item.price || 0,
-      subtotal: (item.quantity * item.price) || 0
-    }));
-    
-    const { error: erroItens } = await supabase
-      .from('itens_pedido')
-      .insert(itensPedido);
-    
-    if (erroItens) throw erroItens;
-    
-    console.log('✅ Pedido salvo no Supabase:', pedido.id);
-    return { success: true, pedidoId: pedido.id };
-    
-  } catch (err) {
-    console.error('❌ Erro ao salvar pedido:', err);
-    return { success: false, error: err.message };
-  }
-}
-
-
-
-
-
-
-
+    // ============================================
     // INICIALIZA
+    // ============================================
     fetchProducts();
   </script>
 </body>

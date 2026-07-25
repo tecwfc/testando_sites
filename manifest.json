@@ -1,0 +1,26 @@
+{
+  "short_name": "Ivo Pita",
+  "name": "Pedido Ivo Pita — Indústria",
+  "icons": [
+    {
+      "src": "assets/papel ivo preto png.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "assets/papel ivo preto png.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "index.html",
+  "background_color": "#ffffff",
+  "theme_color": "#16a34a",
+  "display": "standalone",
+  "scope": "/",
+  "lang": "pt-BR"
+}
+
+

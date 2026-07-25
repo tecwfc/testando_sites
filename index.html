@@ -499,79 +499,6 @@
     const SUPABASE_KEY = "pshijarnndbbmpspxinm";
     const CART_STORAGE_KEY = "glga_ivo_cart_items";
 
-    // DADOS DE EXEMPLO (fallback)
-    //const SAMPLE_PRODUCTS = [
-      //{ description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "Químico" },
-      //{ description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "Químico" },
-    //  { description: "Cloro Líquido", price: 52.80, unidade: "Industrial" },
-    //  { description: "Ácido Clorídrico 37%", price: 29.90, unidade: "Químico" },
-    //  { description: "Peróxido de Hidrogênio 50%", price: 67.30, unidade: "Químico" },
-    //  { description: "Soda Cáustica em Escamas", price: 41.00, unidade: "Industrial" },
-   //   { description: "Ácido Nítrico 65%", price: 58.60, unidade: "Químico" },
-   //   { description: "Sulfato de Alumínio", price: 33.40, unidade: "Químico" }
-  //  ];
-
-    // ============================================
-    // FUNÇÃO PARA SALVAR NO SUPABASE (CORRIGIDA - AGORA NO INÍCIO)
-    // ============================================
-    async function salvarPedidoNoSupabase(itens, quantidadeTotal, valorTotal) {
-      try {
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-        // 1. Criar o pedido
-        const dadosPedido = {
-          numero_pedido: `PED-${String(pedidoCounter).padStart(4, '0')}`,
-          data_pedido: orderDate.value || new Date().toISOString().split('T')[0],
-          quantidade_total: quantidadeTotal,
-          valor_total: valorTotal,
-          status: 'pendente'
-        };
-
-        console.log('📤 Enviando pedido:', dadosPedido);
-
-        const { data: pedido, error: erroPedido } = await supabase
-          .from('pedidos')
-          .insert(dadosPedido)
-          .select()
-          .single();
-
-        if (erroPedido) {
-          console.error('❌ Erro ao criar pedido:', erroPedido);
-          throw erroPedido;
-        }
-
-        console.log('✅ Pedido criado:', pedido);
-
-        // 2. Salvar itens do pedido
-        const itensPedido = itens.map(item => ({
-          pedido_id: pedido.id,
-          produto_descricao: item.description,
-          produto_unidade: item.unidade || '',
-          quantidade: item.quantity,
-          preco_unitario: item.price || 0,
-          subtotal: (item.quantity * item.price) || 0
-        }));
-
-        console.log('📤 Enviando itens:', itensPedido);
-
-        const { error: erroItens } = await supabase
-          .from('itens_pedido')
-          .insert(itensPedido);
-
-        if (erroItens) {
-          console.error('❌ Erro ao salvar itens:', erroItens);
-          throw erroItens;
-        }
-
-        console.log('✅ Pedido salvo com sucesso! ID:', pedido.id);
-        return { success: true, pedidoId: pedido.id };
-
-      } catch (err) {
-        console.error('❌ Erro completo:', err);
-        return { success: false, error: err.message };
-      }
-    }
-
     // ============================================
     // VARIÁVEIS GLOBAIS
     // ============================================
@@ -669,6 +596,65 @@
       cleaned = cleaned.replace(",", ".");
       const num = parseFloat(cleaned);
       return isNaN(num) ? 0 : num;
+    }
+
+    // ============================================
+    // SALVAR PEDIDO NO SUPABASE
+    // ============================================
+    async function salvarPedidoNoSupabase(itens, quantidadeTotal, valorTotal) {
+      try {
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        const dadosPedido = {
+          numero_pedido: `PED-${String(pedidoCounter).padStart(4, '0')}`,
+          data_pedido: orderDate.value || new Date().toISOString().split('T')[0],
+          quantidade_total: quantidadeTotal,
+          valor_total: valorTotal,
+          status: 'pendente'
+        };
+
+        console.log('📤 Enviando pedido:', dadosPedido);
+
+        const { data: pedido, error: erroPedido } = await supabase
+          .from('pedidos')
+          .insert(dadosPedido)
+          .select()
+          .single();
+
+        if (erroPedido) {
+          console.error('❌ Erro ao criar pedido:', erroPedido);
+          throw erroPedido;
+        }
+
+        console.log('✅ Pedido criado:', pedido);
+
+        const itensPedido = itens.map(item => ({
+          pedido_id: pedido.id,
+          produto_descricao: item.description,
+          produto_unidade: item.unidade || '',
+          quantidade: item.quantity,
+          preco_unitario: item.price || 0,
+          subtotal: (item.quantity * item.price) || 0
+        }));
+
+        console.log('📤 Enviando itens:', itensPedido);
+
+        const { error: erroItens } = await supabase
+          .from('itens_pedido')
+          .insert(itensPedido);
+
+        if (erroItens) {
+          console.error('❌ Erro ao salvar itens:', erroItens);
+          throw erroItens;
+        }
+
+        console.log('✅ Pedido salvo com sucesso! ID:', pedido.id);
+        return { success: true, pedidoId: pedido.id };
+
+      } catch (err) {
+        console.error('❌ Erro completo:', err);
+        return { success: false, error: err.message };
+      }
     }
 
     // ============================================
@@ -837,7 +823,7 @@
     }
 
     // ============================================
-    // FETCH PRODUTOS
+    // FETCH PRODUTOS - CORRIGIDO
     // ============================================
     async function fetchProducts() {
       formSkeleton.classList.remove("hidden");
@@ -847,12 +833,18 @@
       try {
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        // Buscar todos os produtos da tabela
         const { data, error } = await supabase
           .from('produtos')
           .select('*')
-          .order('descricao');
+          .order('descricao', { ascending: true });
 
-        if (error) throw error;
+        if (error) {
+          console.error('❌ Erro na consulta:', error);
+          throw error;
+        }
+
+        console.log('📦 Dados recebidos do Supabase:', data);
 
         if (data && data.length > 0) {
           products = data.map(p => ({
@@ -862,16 +854,34 @@
           }));
           showMsg(`✅ ${products.length} produtos carregados do Supabase!`, "success");
         } else {
-          throw new Error("Nenhum produto encontrado");
+          // Se não houver dados, usar dados de exemplo
+          console.warn('⚠️ Nenhum produto encontrado no banco, usando dados de exemplo');
+          products = [
+            { description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "LT" },
+            { description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "KG" },
+            { description: "Cloro Líquido", price: 52.80, unidade: "LT" },
+            { description: "Ácido Clorídrico 37%", price: 29.90, unidade: "LT" },
+            { description: "Peróxido de Hidrogênio 50%", price: 67.30, unidade: "LT" },
+            { description: "Soda Cáustica em Escamas", price: 41.00, unidade: "KG" },
+            { description: "Ácido Nítrico 65%", price: 58.60, unidade: "LT" },
+            { description: "Sulfato de Alumínio", price: 33.40, unidade: "KG" }
+          ];
+          showMsg("⚠️ Usando produtos de exemplo (fallback)", "info");
         }
 
       } catch (err) {
-        console.warn("Erro ao carregar do Supabase:", err);
-        products = SAMPLE_PRODUCTS.map(p => ({
-          description: p.description,
-          price: p.price || 0,
-          unidade: p.unidade || ""
-        }));
+        console.error('❌ Erro ao carregar produtos:', err);
+        // Usar dados de exemplo em caso de erro
+        products = [
+          { description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "LT" },
+          { description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "KG" },
+          { description: "Cloro Líquido", price: 52.80, unidade: "LT" },
+          { description: "Ácido Clorídrico 37%", price: 29.90, unidade: "LT" },
+          { description: "Peróxido de Hidrogênio 50%", price: 67.30, unidade: "LT" },
+          { description: "Soda Cáustica em Escamas", price: 41.00, unidade: "KG" },
+          { description: "Ácido Nítrico 65%", price: 58.60, unidade: "LT" },
+          { description: "Sulfato de Alumínio", price: 33.40, unidade: "KG" }
+        ];
         showMsg("⚠️ Usando produtos de exemplo (fallback)", "info");
       } finally {
         formSkeleton.classList.add("hidden");
@@ -882,7 +892,7 @@
     }
 
     // ============================================
-    // GERAR PDF (CORRIGIDA)
+    // GERAR PDF
     // ============================================
     function generatePDFFromCart() {
       const items = cart.filter(i => i.quantity > 0);
@@ -894,7 +904,7 @@
       const totalQtd = items.reduce((s, i) => s + i.quantity, 0);
       const totalValor = items.reduce((s, i) => s + (i.quantity * i.price), 0);
 
-      // 🔥 SALVAR NO SUPABASE
+      // Salvar no Supabase
       salvarPedidoNoSupabase(items, totalQtd, totalValor).then(result => {
         if (result.success) {
           showMsg(`✅ Pedido #${pedidoCounter} salvo com sucesso!`, "success");
@@ -903,7 +913,7 @@
         }
       });
 
-      // --- GERAR PDF ---
+      // Gerar PDF
       pdfTableBody.innerHTML = "";
 
       items.forEach((o, i) => {

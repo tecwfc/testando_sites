@@ -468,7 +468,7 @@
             <th style="width: 6%;">Item</th>
             <th style="width: 34%;" class="text-left">Produto</th>
             <th style="width: 12%;">Quantidade</th>
-            <th style="width: 12%;">Tipo</th>
+            <th style="width: 12%;">Unidade</th>
             <th style="width: 16%;">Preço Unit.</th>
             <th style="width: 20%;">Total</th>
           </tr>
@@ -500,16 +500,16 @@
     const CART_STORAGE_KEY = "glga_ivo_cart_items";
 
     // DADOS DE EXEMPLO (fallback)
-    const SAMPLE_PRODUCTS = [
-      { description: "Ácido Sulfúrico 98%", price: 45.50, type: "Químico" },
-      { description: "Hidróxido de Sódio 99%", price: 38.20, type: "Químico" },
-      { description: "Cloro Líquido", price: 52.80, type: "Industrial" },
-      { description: "Ácido Clorídrico 37%", price: 29.90, type: "Químico" },
-      { description: "Peróxido de Hidrogênio 50%", price: 67.30, type: "Químico" },
-      { description: "Soda Cáustica em Escamas", price: 41.00, type: "Industrial" },
-      { description: "Ácido Nítrico 65%", price: 58.60, type: "Químico" },
-      { description: "Sulfato de Alumínio", price: 33.40, type: "Químico" }
-    ];
+    //const SAMPLE_PRODUCTS = [
+      //{ description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "Químico" },
+      //{ description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "Químico" },
+    //  { description: "Cloro Líquido", price: 52.80, unidade: "Industrial" },
+    //  { description: "Ácido Clorídrico 37%", price: 29.90, unidade: "Químico" },
+    //  { description: "Peróxido de Hidrogênio 50%", price: 67.30, unidade: "Químico" },
+    //  { description: "Soda Cáustica em Escamas", price: 41.00, unidade: "Industrial" },
+   //   { description: "Ácido Nítrico 65%", price: 58.60, unidade: "Químico" },
+   //   { description: "Sulfato de Alumínio", price: 33.40, unidade: "Químico" }
+  //  ];
 
     // ============================================
     // FUNÇÃO PARA SALVAR NO SUPABASE (CORRIGIDA - AGORA NO INÍCIO)
@@ -546,7 +546,7 @@
         const itensPedido = itens.map(item => ({
           pedido_id: pedido.id,
           produto_descricao: item.description,
-          produto_tipo: item.type || '',
+          produto_unidade: item.unidade || '',
           quantidade: item.quantity,
           preco_unitario: item.price || 0,
           subtotal: (item.quantity * item.price) || 0
@@ -712,7 +712,7 @@
         tr.className = "border-b border-gray-100/80";
         tr.innerHTML = `
           <td class="py-2"><div class="font-medium text-gray-800">${escapeHtml(item.description)}</div>
-            <div class="text-xs text-gray-400">${item.type ? escapeHtml(item.type) : ""} · R$ ${formatNumberToLocal(item.price)}</div></td>
+            <div class="text-xs text-gray-400">${item.unidade ? escapeHtml(item.unidade) : ""} · R$ ${formatNumberToLocal(item.price)}</div></td>
           <td class="text-center py-2">
             <div class="flex items-center justify-center gap-1">
               <button class="qty-btn-minus w-6 h-6 rounded-full bg-red-50 text-red-500 hover:bg-red-100 flex items-center justify-center text-sm font-bold" data-index="${originalIndex}">−</button>
@@ -756,14 +756,14 @@
       saveCart();
     }
 
-    function addToCart(desc, type, price, qty = 1) {
+    function addToCart(desc, unidade, price, qty = 1) {
       const idx = cart.findIndex(i => i.description === desc);
       if (idx !== -1) {
         cart[idx].quantity += qty;
         if (price !== undefined) cart[idx].price = price;
         showMsg(`+${formatNumberToLocal(qty)} ${desc}`, "info");
       } else {
-        cart.push({ description: desc, type: type || "", quantity: qty, price: price || 0 });
+        cart.push({ description: desc, unidade: unidade || "", quantity: qty, price: price || 0 });
         showMsg(`${desc} adicionado`, "success");
       }
       cart = cart.filter(i => i.quantity > 0);
@@ -812,14 +812,14 @@
           <div class="flex-1 min-w-0">
             <div class="font-semibold text-gray-800 text-sm truncate">${escapeHtml(p.description)}</div>
             <div class="flex items-center gap-2 mt-0.5 flex-wrap">
-              <span class="text-xs text-gray-500">${p.type ? escapeHtml(p.type) : ""}</span>
+              <span class="text-xs text-gray-500">${p.unidade ? escapeHtml(p.unidade) : ""}</span>
               ${hasPrice ? `<span class="text-xs font-bold text-green-700">R$ ${formatNumberToLocal(p.price)}</span>` : '<span class="text-xs text-gray-400">—</span>'}
             </div>
           </div>
           <div class="flex items-center gap-2">
             <span class="qty-indicator qty-pill ${qty > 0 ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-400'}">${qty > 0 ? formatNumberToLocal(qty) : "0"}</span>
             <button class="add-to-cart-btn btn-add-mobile" 
-              data-desc="${escapeAttr(p.description)}" data-type="${escapeAttr(p.type || "")}" data-price="${p.price || 0}"
+              data-desc="${escapeAttr(p.description)}" data-unidade="${escapeAttr(p.unidade || "")}" data-price="${p.price || 0}"
               aria-label="Adicionar ao carrinho">
               +
             </button>
@@ -829,9 +829,9 @@
         card.querySelector(".add-to-cart-btn").addEventListener("click", (e) => {
           e.stopPropagation();
           const desc = e.currentTarget.dataset.desc;
-          const type = e.currentTarget.dataset.type;
+          const unidade = e.currentTarget.dataset.unidade;
           const price = parseFloat(e.currentTarget.dataset.price) || 0;
-          addToCart(desc, type, price, 1);
+          addToCart(desc, unidade, price, 1);
         });
       });
     }
@@ -858,7 +858,7 @@
           products = data.map(p => ({
             description: p.descricao || '',
             price: parseFloat(p.preco) || 0,
-            type: p.tipo || ''
+            unidade: p.unidade || ''
           }));
           showMsg(`✅ ${products.length} produtos carregados do Supabase!`, "success");
         } else {
@@ -870,7 +870,7 @@
         products = SAMPLE_PRODUCTS.map(p => ({
           description: p.description,
           price: p.price || 0,
-          type: p.type || ""
+          unidade: p.unidade || ""
         }));
         showMsg("⚠️ Usando produtos de exemplo (fallback)", "info");
       } finally {
@@ -913,7 +913,7 @@
           <td>${String(i + 1).padStart(2, '0')}</td>
           <td class="text-left product-name">${escapeHtml(o.description)}</td>
           <td><strong>${formatNumberToLocal(o.quantity)}</strong></td>
-          <td>${o.type ? o.type.substring(0, 8) : "---"}</td>
+          <td>${o.unidade ? o.unidade.substring(0, 8) : "---"}</td>
           <td class="price-cell">${o.price > 0 ? "R$ " + formatNumberToLocal(o.price) : "-"}</td>
           <td class="total-cell">${o.price > 0 ? "R$ " + formatNumberToLocal(subtotal) : "-"}</td>
         `;
@@ -967,7 +967,7 @@
       let msg = `*📋 PEDIDO GLGA - IVO PITA INDÚSTRIA*\nPedido: #${String(pedidoCounter).padStart(3, '0')}\nData: ${formatDate(orderDate.value)}\n━━━━━━━━━━━━━━━━━━━━\n`;
       items.forEach((item, idx) => {
         const sub = (item.quantity * item.price);
-        msg += `*${idx + 1}.* ${item.description}\n   Qtd: ${formatNumberToLocal(item.quantity)} · ${item.type ? item.type.substring(0, 3).toUpperCase() : "---"}\n   ${item.price > 0 ? "R$ " + formatNumberToLocal(item.price) + " · Total: R$ " + formatNumberToLocal(sub) : "Sem preço"}\n\n`;
+        msg += `*${idx + 1}.* ${item.description}\n   Qtd: ${formatNumberToLocal(item.quantity)} · ${item.unidade ? item.unidade.substring(0, 3).toUpperCase() : "---"}\n   ${item.price > 0 ? "R$ " + formatNumberToLocal(item.price) + " · Total: R$ " + formatNumberToLocal(sub) : "Sem preço"}\n\n`;
       });
       const totalQtd = items.reduce((s, i) => s + i.quantity, 0);
       const totalValor = items.reduce((s, i) => s + (i.quantity * i.price), 0);

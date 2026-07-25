@@ -301,6 +301,58 @@
       color: #6b8a7a;
     }
 
+    /* Modal styles */
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      animation: fadeIn 0.3s ease;
+    }
+
+    .modal-content {
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .fab {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: #0b6e3a;
+      color: white;
+      border: none;
+      font-size: 32px;
+      font-weight: 300;
+      box-shadow: 0 4px 20px rgba(11, 110, 58, 0.4);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 40;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .fab:hover {
+      transform: scale(1.1) rotate(90deg);
+      background: #0f8b4b;
+      box-shadow: 0 6px 28px rgba(11, 110, 58, 0.5);
+    }
+
+    .fab:active {
+      transform: scale(0.95);
+    }
+
     @media (max-width: 640px) {
       body {
         background: #f3faf5;
@@ -326,6 +378,13 @@
       .pdf-table tbody td {
         padding: 4px 3px;
         font-size: 8px;
+      }
+      .fab {
+        width: 50px;
+        height: 50px;
+        font-size: 26px;
+        bottom: 20px;
+        right: 20px;
       }
     }
   </style>
@@ -488,15 +547,84 @@
     </div>
   </div>
 
+  <!-- BOTÃO FLUTUANTE PARA ADICIONAR PRODUTO -->
+  <button id="openAddProductBtn" class="fab" title="Adicionar novo produto">
+    +
+  </button>
+
+  <!-- MODAL PARA ADICIONAR PRODUTO -->
+  <div id="addProductModal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center">
+    <div class="modal-content bg-white rounded-3xl p-6 w-[min(500px,95%)] shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-800 flex items-center gap-2">
+          <span class="text-2xl">➕</span> Adicionar Produto
+        </h3>
+        <button id="closeAddProductBtn" class="text-gray-400 hover:text-gray-600 text-3xl leading-none transition">&times;</button>
+      </div>
+      
+      <form id="addProductForm" class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">
+            Descrição do Produto <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="newProductDesc" required 
+                 placeholder="Ex: Ácido Sulfúrico 98%"
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 focus:border-green-400 outline-none transition">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">
+            Preço (R$) <span class="text-red-500">*</span>
+          </label>
+          <input type="number" id="newProductPrice" step="0.01" required 
+                 placeholder="Ex: 45.50"
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 focus:border-green-400 outline-none transition">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">
+            Unidade <span class="text-red-500">*</span>
+          </label>
+          <select id="newProductUnit" required 
+                  class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 focus:border-green-400 outline-none transition bg-white">
+            <option value="">Selecione a unidade...</option>
+            <option value="LT">LT - Litro</option>
+            <option value="KG">KG - Quilograma</option>
+            <option value="UN">UN - Unidade</option>
+            <option value="MT">MT - Metro</option>
+            <option value="M2">M² - Metro Quadrado</option>
+            <option value="M3">M³ - Metro Cúbico</option>
+            <option value="TON">TON - Tonelada</option>
+            <option value="G">G - Grama</option>
+            <option value="ML">ML - Mililitro</option>
+            <option value="PC">PC - Peça</option>
+          </select>
+        </div>
+        
+        <div id="modalMessageBox" class="hidden text-sm p-3 rounded-2xl"></div>
+        
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 btn-primary py-3 text-sm font-semibold">
+            ✅ Adicionar Produto
+          </button>
+          <button type="button" id="cancelAddProductBtn" 
+                  class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-full text-sm font-semibold transition">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
   <script src="https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js">
   </script>
 
   <script>
     // ============================================
-    // CONFIGURAÇÃO
+    // CONFIGURAÇÃO - CHAVE CORRIGIDA
     // ============================================
     const SUPABASE_URL = "https://pshijarnndbbmpspxinm.supabase.co";
-    const SUPABASE_KEY = "pshijarnndbbmpspxinm";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzaGlqYXJubmRiYm1wc3B4aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5Nzc3MjUsImV4cCI6MjEwMDU1MzcyNX0.Bj9H5L0x70hpUOj4tSQu3oXwWpY6yoHgQcDGMAejg8o";
     const CART_STORAGE_KEY = "glga_ivo_cart_items";
 
     // ============================================
@@ -520,6 +648,14 @@
     const pdfTableBody = document.getElementById("pdfTableBody");
     const pdfTotalQtd = document.getElementById("pdfTotalQtd");
     const pdfTotalFinal = document.getElementById("pdfTotalFinal");
+
+    // Modal elements
+    const openAddProductBtn = document.getElementById("openAddProductBtn");
+    const addProductModal = document.getElementById("addProductModal");
+    const closeAddProductBtn = document.getElementById("closeAddProductBtn");
+    const cancelAddProductBtn = document.getElementById("cancelAddProductBtn");
+    const addProductForm = document.getElementById("addProductForm");
+    const modalMessageBox = document.getElementById("modalMessageBox");
 
     let products = [];
     let cart = loadCart();
@@ -572,6 +708,12 @@
       messageBox.className = "mt-3 p-3 rounded-2xl text-sm " + (type === "success" ? "bg-green-50 text-green-700" : type === "error" ? "bg-red-50 text-red-700" : "bg-yellow-50 text-yellow-700");
       messageBox.classList.remove("hidden");
       setTimeout(() => messageBox.classList.add("hidden"), 3500);
+    }
+
+    function showModalMsg(text, type = "success") {
+      modalMessageBox.textContent = text;
+      modalMessageBox.className = "text-sm p-3 rounded-2xl " + (type === "success" ? "bg-green-50 text-green-700" : type === "error" ? "bg-red-50 text-red-700" : "bg-yellow-50 text-yellow-700");
+      modalMessageBox.classList.remove("hidden");
     }
 
     function escapeHtml(s) {
@@ -656,6 +798,104 @@
         return { success: false, error: err.message };
       }
     }
+
+    // ============================================
+    // ADICIONAR PRODUTO - MODAL
+    // ============================================
+    function openModal() {
+      addProductModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+      modalMessageBox.classList.add('hidden');
+      addProductForm.reset();
+    }
+
+    function closeModal() {
+      addProductModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      modalMessageBox.classList.add('hidden');
+    }
+
+    openAddProductBtn.addEventListener('click', openModal);
+    closeAddProductBtn.addEventListener('click', closeModal);
+    cancelAddProductBtn.addEventListener('click', closeModal);
+
+    // Fechar ao clicar fora do modal
+    addProductModal.addEventListener('click', (e) => {
+      if (e.target === addProductModal) closeModal();
+    });
+
+    // Fechar com ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !addProductModal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    // Enviar formulário de adicionar produto
+    addProductForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const descricao = document.getElementById('newProductDesc').value.trim();
+      const preco = document.getElementById('newProductPrice').value.trim();
+      const unidade = document.getElementById('newProductUnit').value;
+      
+      if (!descricao) {
+        showModalMsg('❌ Por favor, informe a descrição do produto', 'error');
+        return;
+      }
+      
+      if (!preco) {
+        showModalMsg('❌ Por favor, informe o preço do produto', 'error');
+        return;
+      }
+      
+      if (!unidade) {
+        showModalMsg('❌ Por favor, selecione a unidade do produto', 'error');
+        return;
+      }
+      
+      const precoNum = parseFloat(preco.replace(',', '.'));
+      if (isNaN(precoNum) || precoNum <= 0) {
+        showModalMsg('❌ Por favor, informe um preço válido (maior que 0)', 'error');
+        return;
+      }
+      
+      const submitBtn = addProductForm.querySelector('button[type="submit"]');
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Salvando...';
+      
+      try {
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        const { data, error } = await supabase
+          .from('produtos')
+          .insert([
+            { 
+              descricao: descricao, 
+              preco: precoNum.toFixed(2), 
+              unidade: unidade 
+            }
+          ])
+          .select();
+        
+        if (error) throw error;
+        
+        showModalMsg(`✅ Produto "${descricao}" adicionado com sucesso!`, 'success');
+        
+        setTimeout(() => {
+          closeModal();
+          fetchProducts();
+        }, 1500);
+        
+      } catch (err) {
+        console.error('Erro ao adicionar produto:', err);
+        showModalMsg(`❌ Erro ao adicionar: ${err.message || 'Erro desconhecido'}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
 
     // ============================================
     // RENDER CARRINHO
@@ -823,7 +1063,7 @@
     }
 
     // ============================================
-    // FETCH PRODUTOS - CORRIGIDO
+    // FETCH PRODUTOS
     // ============================================
     async function fetchProducts() {
       formSkeleton.classList.remove("hidden");
@@ -833,7 +1073,6 @@
       try {
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        // Buscar todos os produtos da tabela
         const { data, error } = await supabase
           .from('produtos')
           .select('*')
@@ -854,8 +1093,7 @@
           }));
           showMsg(`✅ ${products.length} produtos carregados do Supabase!`, "success");
         } else {
-          // Se não houver dados, usar dados de exemplo
-          console.warn('⚠️ Nenhum produto encontrado no banco, usando dados de exemplo');
+          console.warn('⚠️ Nenhum produto encontrado no banco');
           products = [
             { description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "LT" },
             { description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "KG" },
@@ -871,7 +1109,6 @@
 
       } catch (err) {
         console.error('❌ Erro ao carregar produtos:', err);
-        // Usar dados de exemplo em caso de erro
         products = [
           { description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "LT" },
           { description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "KG" },

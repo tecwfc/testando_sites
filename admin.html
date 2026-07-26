@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" />
   <title>Admin - Gerenciar Produtos</title>
   
   <!-- Supabase Client -->
@@ -10,227 +10,553 @@
   <script src="https://cdn.tailwindcss.com"></script>
   
   <style>
+    /* ===== RESET E BASE ===== */
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f3f4f6;
+      -webkit-font-smoothing: antialiased;
+      margin: 0;
+      padding: 0;
+    }
+
+    /* ===== LAYOUT PRINCIPAL ===== */
+    .app-container {
+      display: flex;
+      min-height: 100vh;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* ===== SIDEBAR ===== */
     .sidebar {
       background: linear-gradient(180deg, #0b6e3a 0%, #064a26 100%);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 50;
+      width: 260px;
+      flex-shrink: 0;
+      height: 100vh;
+      overflow-y: auto;
+      position: sticky;
+      top: 0;
     }
+
     .sidebar-link {
       transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+      border-radius: 12px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: rgba(255,255,255,0.8);
     }
     .sidebar-link:hover {
       background: rgba(255,255,255,0.15);
       transform: translateX(4px);
+      color: white;
     }
     .sidebar-link.active {
       background: rgba(255,255,255,0.2);
       border-left: 3px solid #4ade80;
+      color: white;
     }
-    .card-hover {
-      transition: all 0.2s;
+
+    /* ===== MAIN CONTENT ===== */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      height: 100vh;
+      padding: 20px 24px;
+      background: #f3f4f6;
     }
-    .card-hover:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+
+    /* ===== BOTÃO HAMBURGUER ===== */
+    .hamburger-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      transition: all 0.3s;
     }
-    .status-badge {
-      padding: 2px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
+    .hamburger-btn span {
+      display: block;
+      width: 24px;
+      height: 2.5px;
+      background: #0b6e3a;
+      border-radius: 2px;
+      transition: all 0.3s;
     }
-    .status-active { background: #dcfce7; color: #166534; }
-    .status-inactive { background: #fee2e2; color: #991b1b; }
-    
-    .modal-overlay {
+    .hamburger-btn.active span:nth-child(1) {
+      transform: rotate(45deg) translate(5px, 5px);
+    }
+    .hamburger-btn.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .hamburger-btn.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(5px, -5px);
+    }
+
+    /* ===== OVERLAY MOBILE ===== */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
       background: rgba(0,0,0,0.5);
       backdrop-filter: blur(4px);
+      z-index: 40;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s ease;
+      display: none;
     }
-    
-    @keyframes slideIn {
-      from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
+    .sidebar-overlay.active {
+      opacity: 1;
+      visibility: visible;
+      display: block;
     }
-    .modal-content {
-      animation: slideIn 0.3s ease;
+
+    /* ===== CARDS ===== */
+    .stat-card {
+      background: white;
+      border-radius: 16px;
+      padding: 16px 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+      transition: all 0.2s;
+      border: 1px solid rgba(0,0,0,0.04);
     }
-    
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    }
+    .stat-card .icon {
+      font-size: 24px;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 12px;
+    }
+
+    /* ===== BOTÕES ===== */
     .btn-primary {
       background: #0b6e3a;
       color: white;
-      padding: 8px 20px;
+      padding: 10px 24px;
       border-radius: 30px;
       transition: all 0.2s;
       border: none;
       cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
     }
     .btn-primary:hover {
       background: #0f8b4b;
       transform: scale(1.02);
     }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .btn-secondary {
+      background: #f3f4f6;
+      color: #374151;
+      padding: 10px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-secondary:hover {
+      background: #e5e7eb;
+    }
+
     .btn-danger {
       background: #dc2626;
       color: white;
-      padding: 8px 20px;
+      padding: 8px 16px;
       border-radius: 30px;
       transition: all 0.2s;
       border: none;
       cursor: pointer;
+      font-weight: 500;
+      font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
     .btn-danger:hover {
       background: #b91c1c;
     }
-    .btn-secondary {
-      background: #e5e7eb;
-      color: #374151;
-      padding: 8px 20px;
+
+    .btn-edit {
+      background: #3b82f6;
+      color: white;
+      padding: 8px 16px;
       border-radius: 30px;
       transition: all 0.2s;
       border: none;
       cursor: pointer;
-    }
-    .btn-secondary:hover {
-      background: #d1d5db;
-    }
-    .btn-sm {
-      padding: 4px 12px;
+      font-weight: 500;
       font-size: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .btn-edit:hover {
+      background: #2563eb;
+    }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 11px;
+    }
+
+    /* ===== STATUS BADGE ===== */
+    .status-badge {
+      padding: 3px 14px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-block;
+      white-space: nowrap;
+    }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-inactive { background: #fee2e2; color: #991b1b; }
+    .status-unit { background: #dbeafe; color: #1e40af; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      animation: fadeIn 0.25s ease;
+    }
+    .modal-content {
+      animation: slideUp 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    @keyframes slideUp {
+      from { transform: translateY(30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ===== TABELA RESPONSIVA ===== */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .table-wrap table {
+      min-width: 700px;
+      width: 100%;
+    }
+
+    /* ===== SCROLLBAR ===== */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #c1c7cd;
+      border-radius: 8px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a0a8b0;
+    }
+
+    /* ===== HEADER MOBILE ===== */
+    .mobile-header {
+      display: none;
+    }
+
+    /* ===== RESPONSIVO ===== */
+    @media (max-width: 1024px) {
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        transform: translateX(-100%);
+        box-shadow: 4px 0 30px rgba(0,0,0,0.15);
+        z-index: 50;
+      }
+      .sidebar.open {
+        transform: translateX(0);
+      }
+      .sidebar-overlay {
+        display: none;
+      }
+      .sidebar-overlay.active {
+        display: block;
+      }
+      .mobile-header {
+        display: flex;
+      }
+      .main-content {
+        padding: 16px;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .stat-card .icon {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+      }
+      .stat-card .value {
+        font-size: 20px;
+      }
+      .stat-card .label {
+        font-size: 12px;
+      }
+      .btn-primary {
+        padding: 8px 16px;
+        font-size: 13px;
+      }
+      .btn-secondary {
+        padding: 8px 14px;
+        font-size: 12px;
+      }
+      .modal-content {
+        margin: 10px;
+        padding: 16px !important;
+      }
+      .table-wrap table {
+        min-width: 600px;
+      }
+      .table-wrap td, 
+      .table-wrap th {
+        padding: 10px 12px !important;
+        font-size: 12px !important;
+      }
+      .status-badge {
+        font-size: 10px;
+        padding: 2px 10px;
+      }
+      .main-content {
+        padding: 12px;
+      }
+    }
+
+    @media (max-width: 380px) {
+      .sidebar {
+        width: 100%;
+      }
+      .table-wrap table {
+        min-width: 500px;
+      }
     }
   </style>
 </head>
-<body class="bg-gray-50 flex h-screen overflow-hidden">
+<body>
 
-  <!-- Sidebar -->
-  <aside class="sidebar w-64 text-white flex-shrink-0 h-screen overflow-y-auto">
-    <div class="p-6 border-b border-white/10">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
-          <span class="text-primary text-xl font-bold">IP</span>
+  <!-- ===== OVERLAY MOBILE ===== -->
+  <div id="sidebarOverlay" class="sidebar-overlay" onclick="closeSidebar()"></div>
+
+  <!-- ===== APP CONTAINER ===== -->
+  <div class="app-container">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside id="sidebar" class="sidebar">
+      <div class="p-5 border-b border-white/10 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center flex-shrink-0">
+            <span class="text-primary text-lg font-bold">IP</span>
+          </div>
+          <div>
+            <h1 class="font-bold text-base text-white">Ivo Pita</h1>
+            <p class="text-xs text-white/70">Indústria GLGA</p>
+          </div>
         </div>
+        <button onclick="closeSidebar()" class="lg:hidden text-white/70 hover:text-white text-2xl">&times;</button>
+      </div>
+      
+      <nav class="p-3 space-y-1">
+        <a href="dashboard.html" class="sidebar-link">
+          <span>📊</span> Dashboard
+        </a>
+        <a href="admin.html" class="sidebar-link active">
+          <span>📦</span> Produtos
+        </a>
+        <a href="pedidos.html" class="sidebar-link">
+          <span>📋</span> Pedidos
+        </a>
+        <a href="configuracoes.html" class="sidebar-link">
+          <span>⚙️</span> Configurações
+        </a>
+      </nav>
+      
+      <div class="absolute bottom-0 p-4 border-t border-white/10 w-full">
+        <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm text-white/70 hover:text-white hover:bg-white/10 transition">
+          <span>🏠</span> Voltar ao Site
+        </a>
+      </div>
+    </aside>
+
+    <!-- ===== MAIN CONTENT ===== -->
+    <main class="main-content">
+      
+      <!-- ===== HEADER MOBILE ===== -->
+      <div class="mobile-header flex items-center justify-between mb-4 bg-white rounded-2xl p-3 shadow-sm sticky top-0 z-30">
+        <button class="hamburger-btn" onclick="toggleSidebar()" aria-label="Abrir menu">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+        <div class="flex items-center gap-2">
+          <span class="text-sm font-semibold text-gray-700">Admin</span>
+          <span class="text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded-full">GLGA</span>
+        </div>
+        <div class="w-8"></div>
+      </div>
+
+      <!-- ===== HEADER ===== -->
+      <div class="flex flex-wrap justify-between items-center gap-3 mb-5">
         <div>
-          <h1 class="font-bold text-lg">Ivo Pita</h1>
-          <p class="text-xs opacity-70">Indústria GLGA</p>
+          <h2 class="text-xl sm:text-2xl font-bold text-gray-800 flex items-center gap-2">
+            📦 Gerenciar Produtos
+          </h2>
+          <p class="text-sm text-gray-500 hidden sm:block">Gerencie todos os produtos do seu catálogo</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button id="exportBtn" class="btn-secondary text-sm">
+            📥 Exportar
+          </button>
+          <button id="openAddModalBtn" class="btn-primary text-sm">
+            <span class="text-lg leading-none">+</span> Novo Produto
+          </button>
         </div>
       </div>
-    </div>
-    
-    <!-- No admin.html, substitua o menu lateral por: -->
-<nav class="p-4 space-y-1">
-  <a href="dashboard.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
-    <span>📊</span> Dashboard
-  </a>
-  <a href="admin.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg text-sm">
-    <span>📦</span> Produtos
-  </a>
-  <a href="pedidos.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
-    <span>📋</span> Pedidos
-  </a>
-  <a href="configuracoes.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
-    <span>⚙️</span> Configurações
-  </a>
-</nav>
-    
-    <div class="absolute bottom-0 p-4 border-t border-white/10 w-64">
-      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100 transition">
-        <span>🏠</span> Voltar ao Site
-      </a>
-    </div>
-  </aside>
 
-  <!-- Main Content -->
-  <main class="flex-1 overflow-y-auto p-6">
-    <!-- Header -->
-    <div class="flex justify-between items-center mb-6">
-      <div>
-        <h2 class="text-2xl font-bold text-gray-800">📦 Gerenciar Produtos</h2>
-        <p class="text-sm text-gray-500">Gerencie todos os produtos do seu catálogo</p>
-      </div>
-      <div class="flex gap-3">
-        <button id="exportBtn" class="btn-secondary text-sm flex items-center gap-2">
-          📥 Exportar
-        </button>
-        <button id="openAddModalBtn" class="btn-primary flex items-center gap-2">
-          <span class="text-lg">+</span> Novo Produto
-        </button>
-      </div>
-    </div>
-
-    <!-- Stats -->
-    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-      <div class="bg-white rounded-2xl p-4 shadow-sm card-hover">
-        <p class="text-sm text-gray-500">Total Produtos</p>
-        <p class="text-2xl font-bold text-gray-800" id="totalProducts">0</p>
-      </div>
-      <div class="bg-white rounded-2xl p-4 shadow-sm card-hover">
-        <p class="text-sm text-gray-500">Preço Médio</p>
-        <p class="text-2xl font-bold text-green-600" id="avgPrice">R$ 0,00</p>
-      </div>
-      <div class="bg-white rounded-2xl p-4 shadow-sm card-hover">
-        <p class="text-sm text-gray-500">Produtos Ativos</p>
-        <p class="text-2xl font-bold text-blue-600" id="activeProducts">0</p>
-      </div>
-      <div class="bg-white rounded-2xl p-4 shadow-sm card-hover">
-        <p class="text-sm text-gray-500">Última Atualização</p>
-        <p class="text-sm font-semibold text-gray-700" id="lastUpdate">-</p>
-      </div>
-    </div>
-
-    <!-- Search & Filter -->
-    <div class="bg-white rounded-2xl p-4 shadow-sm mb-6">
-      <div class="flex flex-wrap gap-4 items-center">
-        <div class="flex-1 min-w-[200px]">
-          <input type="text" id="searchInput" placeholder="🔍 Buscar produtos..." 
-                 class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none">
+      <!-- ===== STATS CARDS ===== -->
+      <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-5">
+        <div class="stat-card flex items-center gap-3">
+          <div class="icon bg-green-50 text-green-700">📦</div>
+          <div>
+            <p class="label text-xs text-gray-500">Total</p>
+            <p class="value text-xl font-bold text-gray-800" id="totalProducts">0</p>
+          </div>
         </div>
-        <div class="flex gap-2">
-          <select id="filterUnit" class="px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none bg-white">
-            <option value="">Todas Unidades</option>
-            <option value="LT">LT</option>
-            <option value="KG">KG</option>
-            <option value="UN">UN</option>
-            <option value="MT">MT</option>
-            <option value="M2">M²</option>
-            <option value="M3">M³</option>
-            <option value="TON">TON</option>
-            <option value="G">G</option>
-            <option value="ML">ML</option>
-            <option value="PC">PC</option>
-          </select>
-          <button id="clearFiltersBtn" class="btn-secondary text-sm">Limpar Filtros</button>
+        <div class="stat-card flex items-center gap-3">
+          <div class="icon bg-blue-50 text-blue-700">💰</div>
+          <div>
+            <p class="label text-xs text-gray-500">Preço Médio</p>
+            <p class="value text-xl font-bold text-green-600" id="avgPrice">R$ 0,00</p>
+          </div>
+        </div>
+        <div class="stat-card flex items-center gap-3">
+          <div class="icon bg-emerald-50 text-emerald-700">✅</div>
+          <div>
+            <p class="label text-xs text-gray-500">Ativos</p>
+            <p class="value text-xl font-bold text-blue-600" id="activeProducts">0</p>
+          </div>
+        </div>
+        <div class="stat-card flex items-center gap-3">
+          <div class="icon bg-purple-50 text-purple-700">🕐</div>
+          <div>
+            <p class="label text-xs text-gray-500">Atualizado</p>
+            <p class="value text-sm font-semibold text-gray-700 truncate max-w-[80px]" id="lastUpdate">-</p>
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Products Table -->
-    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
-      <div class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-200">
-            <tr>
-              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">ID</th>
-              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Produto</th>
-              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Unidade</th>
-              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Preço</th>
-              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
-              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Criado em</th>
-              <th class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Ações</th>
-            </tr>
-          </thead>
-          <tbody id="productsTableBody" class="divide-y divide-gray-100">
-            <!-- Produtos serão inseridos aqui -->
-          </tbody>
-        </table>
+      <!-- ===== SEARCH & FILTER ===== -->
+      <div class="bg-white rounded-2xl p-3 sm:p-4 shadow-sm mb-5">
+        <div class="flex flex-col sm:flex-row gap-3">
+          <div class="flex-1 min-w-[150px]">
+            <input type="text" id="searchInput" placeholder="🔍 Buscar produtos..." 
+                   class="w-full px-4 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none text-sm">
+          </div>
+          <div class="flex flex-wrap gap-2">
+            <select id="filterStatus" class="px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none bg-white text-sm flex-1 sm:flex-none min-w-[120px]">
+              <option value="">Status</option>
+              <option value="ativo">✅ Ativos</option>
+              <option value="inativo">⛔ Ocultos</option>
+            </select>
+            <select id="filterUnit" class="px-3 py-2.5 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none bg-white text-sm flex-1 sm:flex-none min-w-[100px]">
+              <option value="">Unidade</option>
+              <option value="LT">LT</option>
+              <option value="KG">KG</option>
+              <option value="UN">UN</option>
+              <option value="MT">MT</option>
+              <option value="M2">M²</option>
+              <option value="M3">M³</option>
+              <option value="TON">TON</option>
+              <option value="G">G</option>
+              <option value="ML">ML</option>
+              <option value="PC">PC</option>
+            </select>
+            <button id="clearFiltersBtn" class="btn-secondary text-sm">Limpar</button>
+            <button id="refreshBtn" class="btn-primary text-sm flex items-center gap-1">
+              🔄
+            </button>
+          </div>
+        </div>
       </div>
-      <div id="loadingIndicator" class="text-center py-8 text-gray-400">
-        ⏳ Carregando produtos...
-      </div>
-    </div>
-  </main>
 
-  <!-- Modal Adicionar/Editar Produto -->
-  <div id="productModal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center">
-    <div class="modal-content bg-white rounded-3xl p-6 w-[min(500px,95%)] shadow-2xl">
+      <!-- ===== PRODUCTS TABLE ===== -->
+      <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+        <div class="table-wrap">
+          <table class="w-full">
+            <thead class="bg-gray-50 border-b border-gray-200">
+              <tr>
+                <th class="text-left px-4 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">ID</th>
+                <th class="text-left px-4 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Produto</th>
+                <th class="text-left px-4 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase hidden sm:table-cell">Unidade</th>
+                <th class="text-left px-4 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Preço</th>
+                <th class="text-left px-4 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase hidden md:table-cell">Status</th>
+                <th class="text-left px-4 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase hidden lg:table-cell">Criado em</th>
+                <th class="text-center px-4 sm:px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Ações</th>
+              </tr>
+            </thead>
+            <tbody id="productsTableBody" class="divide-y divide-gray-100">
+              <!-- Produtos serão inseridos aqui -->
+            </tbody>
+          </table>
+        </div>
+        <div id="loadingIndicator" class="text-center py-8 text-gray-400 text-sm">
+          ⏳ Carregando produtos...
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ===== MODAL ===== -->
+  <div id="productModal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center p-4">
+    <div class="modal-content bg-white rounded-3xl p-5 sm:p-6 w-full max-w-md shadow-2xl">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-xl font-bold text-gray-800" id="modalTitle">➕ Adicionar Produto</h3>
-        <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 text-3xl leading-none transition">&times;</button>
+        <h3 class="text-lg sm:text-xl font-bold text-gray-800" id="modalTitle">➕ Adicionar Produto</h3>
+        <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 text-2xl leading-none transition">&times;</button>
       </div>
       
       <form id="productForm" class="space-y-4">
@@ -238,11 +564,11 @@
         
         <div>
           <label class="block text-sm font-semibold text-gray-700 mb-1">
-            Descrição do Produto <span class="text-red-500">*</span>
+            Descrição <span class="text-red-500">*</span>
           </label>
           <input type="text" id="formDescricao" required 
                  placeholder="Ex: Ácido Sulfúrico 98%"
-                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none">
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none text-sm">
         </div>
         
         <div>
@@ -251,7 +577,7 @@
           </label>
           <input type="number" id="formPreco" step="0.01" required 
                  placeholder="Ex: 45.50"
-                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none">
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none text-sm">
         </div>
         
         <div>
@@ -259,7 +585,7 @@
             Unidade <span class="text-red-500">*</span>
           </label>
           <select id="formUnidade" required 
-                  class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none bg-white">
+                  class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none bg-white text-sm">
             <option value="">Selecione...</option>
             <option value="LT">LT - Litro</option>
             <option value="KG">KG - Quilograma</option>
@@ -274,11 +600,21 @@
           </select>
         </div>
         
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">
+            Status
+          </label>
+          <select id="formStatus" class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none bg-white text-sm">
+            <option value="true">✅ Ativo (aparece no site)</option>
+            <option value="false">⛔ Oculto (não aparece no site)</option>
+          </select>
+        </div>
+        
         <div id="modalMessage" class="hidden text-sm p-3 rounded-2xl"></div>
         
         <div class="flex gap-3 pt-2">
-          <button type="submit" class="flex-1 btn-primary py-3 text-sm font-semibold" id="formSubmitBtn">
-            ✅ Salvar Produto
+          <button type="submit" class="flex-1 btn-primary py-3 text-sm font-semibold justify-center" id="formSubmitBtn">
+            ✅ Salvar
           </button>
           <button type="button" id="cancelModalBtn" 
                   class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-full text-sm font-semibold transition">
@@ -297,6 +633,31 @@
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzaGlqYXJubmRiYm1wc3B4aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5Nzc3MjUsImV4cCI6MjEwMDU1MzcyNX0.Bj9H5L0x70hpUOj4tSQu3oXwWpY6yoHgQcDGMAejg8o";
 
     // ============================================
+    // SIDEBAR MOBILE
+    // ============================================
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    function toggleSidebar() {
+      sidebar.classList.toggle('open');
+      overlay.classList.toggle('active');
+      document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    // Fechar sidebar ao redimensionar para desktop
+    window.addEventListener('resize', () => {
+      if (window.innerWidth >= 1024) {
+        closeSidebar();
+      }
+    });
+
+    // ============================================
     // VARIÁVEIS
     // ============================================
     let allProducts = [];
@@ -307,7 +668,9 @@
     const loadingIndicator = document.getElementById('loadingIndicator');
     const searchInput = document.getElementById('searchInput');
     const filterUnit = document.getElementById('filterUnit');
+    const filterStatus = document.getElementById('filterStatus');
     const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
     const openAddModalBtn = document.getElementById('openAddModalBtn');
     const closeModalBtn = document.getElementById('closeModalBtn');
     const cancelModalBtn = document.getElementById('cancelModalBtn');
@@ -318,6 +681,7 @@
     const formDescricao = document.getElementById('formDescricao');
     const formPreco = document.getElementById('formPreco');
     const formUnidade = document.getElementById('formUnidade');
+    const formStatus = document.getElementById('formStatus');
     const modalMessage = document.getElementById('modalMessage');
     const formSubmitBtn = document.getElementById('formSubmitBtn');
     const exportBtn = document.getElementById('exportBtn');
@@ -326,6 +690,54 @@
     const avgPrice = document.getElementById('avgPrice');
     const activeProducts = document.getElementById('activeProducts');
     const lastUpdate = document.getElementById('lastUpdate');
+
+    // ============================================
+    // FUNÇÕES GLOBAIS
+    // ============================================
+    window.editProduct = function(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (product) openModal(product);
+      else alert('Produto não encontrado!');
+    };
+
+    window.deleteProduct = async function(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (!product) return;
+      
+      if (!confirm(`Excluir "${product.descricao}"?`)) return;
+
+      try {
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { error } = await supabase.from('produtos').delete().eq('id', id);
+        if (error) throw error;
+        alert('✅ Excluído!');
+        await loadProducts();
+      } catch (err) {
+        alert(`❌ ${err.message}`);
+      }
+    };
+
+    window.toggleProduto = async function(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (!product) return;
+
+      const novoStatus = product.ativo !== false ? false : true;
+      const acao = novoStatus ? 'mostrar' : 'ocultar';
+      
+      if (!confirm(`${acao.charAt(0).toUpperCase() + acao.slice(1)} "${product.descricao}"?`)) return;
+
+      try {
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { error } = await supabase
+          .from('produtos')
+          .update({ ativo: novoStatus })
+          .eq('id', id);
+        if (error) throw error;
+        await loadProducts();
+      } catch (err) {
+        alert(`❌ ${err.message}`);
+      }
+    };
 
     // ============================================
     // FUNÇÕES
@@ -361,14 +773,16 @@
         formDescricao.value = product.descricao || '';
         formPreco.value = product.preco || '';
         formUnidade.value = product.unidade || '';
-        formSubmitBtn.textContent = '💾 Atualizar Produto';
+        formStatus.value = product.ativo !== false ? 'true' : 'false';
+        formSubmitBtn.textContent = '💾 Atualizar';
       } else {
         modalTitle.textContent = '➕ Adicionar Produto';
         editProductId.value = '';
         formDescricao.value = '';
         formPreco.value = '';
         formUnidade.value = '';
-        formSubmitBtn.textContent = '✅ Adicionar Produto';
+        formStatus.value = 'true';
+        formSubmitBtn.textContent = '✅ Adicionar';
       }
       productModal.classList.remove('hidden');
       document.body.style.overflow = 'hidden';
@@ -378,6 +792,11 @@
       productModal.classList.add('hidden');
       document.body.style.overflow = 'auto';
       hideModalMessage();
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
     }
 
     // ============================================
@@ -398,24 +817,13 @@
 
         allProducts = data || [];
         filteredProducts = [...allProducts];
-        
-        // Atualizar stats
         updateStats();
-        
-        // Renderizar tabela
         renderTable();
-        
-        // Atualizar último update
         lastUpdate.textContent = new Date().toLocaleString('pt-BR');
 
       } catch (err) {
-        console.error('Erro ao carregar produtos:', err);
         tableBody.innerHTML = `
-          <tr>
-            <td colspan="7" class="text-center py-8 text-red-500">
-              ❌ Erro ao carregar produtos: ${err.message}
-            </td>
-          </tr>
+          <tr><td colspan="7" class="text-center py-8 text-red-500 text-sm">❌ ${err.message}</td></tr>
         `;
       } finally {
         loadingIndicator.classList.add('hidden');
@@ -428,48 +836,47 @@
     function renderTable() {
       if (!filteredProducts.length) {
         tableBody.innerHTML = `
-          <tr>
-            <td colspan="7" class="text-center py-8 text-gray-400">
-              📭 Nenhum produto encontrado
-            </td>
-          </tr>
+          <tr><td colspan="7" class="text-center py-8 text-gray-400 text-sm">📭 Nenhum produto encontrado</td></tr>
         `;
         return;
       }
 
-      tableBody.innerHTML = filteredProducts.map(p => `
-        <tr class="hover:bg-gray-50 transition">
-          <td class="px-6 py-3 text-sm text-gray-500">#${p.id}</td>
-          <td class="px-6 py-3">
-            <div class="font-medium text-gray-800">${escapeHtml(p.descricao)}</div>
+      tableBody.innerHTML = filteredProducts.map(p => {
+        const isActive = p.ativo !== false;
+        return `
+        <tr class="hover:bg-gray-50 transition ${!isActive ? 'opacity-60' : ''}">
+          <td class="px-4 sm:px-6 py-3 text-sm text-gray-500">#${p.id}</td>
+          <td class="px-4 sm:px-6 py-3">
+            <div class="font-medium text-gray-800 text-sm">${escapeHtml(p.descricao)}</div>
+            ${!isActive ? '<span class="text-xs text-red-500">(Oculto)</span>' : ''}
+            <span class="sm:hidden text-xs text-gray-400 block mt-0.5">${escapeHtml(p.unidade || '---')}</span>
           </td>
-          <td class="px-6 py-3">
-            <span class="status-badge bg-blue-50 text-blue-700">${escapeHtml(p.unidade || '---')}</span>
+          <td class="px-4 sm:px-6 py-3 hidden sm:table-cell">
+            <span class="status-badge status-unit">${escapeHtml(p.unidade || '---')}</span>
           </td>
-          <td class="px-6 py-3 font-semibold text-green-700">${formatCurrency(p.preco)}</td>
-          <td class="px-6 py-3">
-            <span class="status-badge status-active">Ativo</span>
+          <td class="px-4 sm:px-6 py-3 font-semibold text-green-700 text-sm">${formatCurrency(p.preco)}</td>
+          <td class="px-4 sm:px-6 py-3 hidden md:table-cell">
+            <span class="status-badge ${isActive ? 'status-active' : 'status-inactive'}">
+              ${isActive ? '✅ Ativo' : '⛔ Oculto'}
+            </span>
           </td>
-          <td class="px-6 py-3 text-sm text-gray-500">${formatDate(p.criado_em)}</td>
-          <td class="px-6 py-3">
-            <div class="flex justify-center gap-2">
-              <button onclick="editProduct(${p.id})" 
-                      class="btn-secondary btn-sm flex items-center gap-1">
-                ✏️ Editar
+          <td class="px-4 sm:px-6 py-3 text-sm text-gray-500 hidden lg:table-cell">${formatDate(p.criado_em)}</td>
+          <td class="px-4 sm:px-6 py-3">
+            <div class="flex flex-wrap justify-center gap-1">
+              <button onclick="window.toggleProduto(${p.id})" 
+                      class="${isActive ? 'btn-secondary' : 'btn-primary'} btn-sm flex items-center gap-1 text-xs">
+                ${isActive ? '👁️' : '👁️'}
               </button>
-              <button onclick="deleteProduct(${p.id})" 
-                      class="btn-danger btn-sm flex items-center gap-1">
+              <button onclick="window.editProduct(${p.id})" class="btn-edit btn-sm flex items-center gap-1 text-xs">
+                ✏️
+              </button>
+              <button onclick="window.deleteProduct(${p.id})" class="btn-danger btn-sm flex items-center gap-1 text-xs">
                 🗑️
               </button>
             </div>
           </td>
         </tr>
-      `).join('');
-    }
-
-    function escapeHtml(text) {
-      if (!text) return '';
-      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      `}).join('');
     }
 
     // ============================================
@@ -477,12 +884,10 @@
     // ============================================
     function updateStats() {
       totalProducts.textContent = allProducts.length;
-      
       const prices = allProducts.map(p => parseFloat(p.preco) || 0);
       const avg = prices.length ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
       avgPrice.textContent = formatCurrency(avg);
-      
-      activeProducts.textContent = allProducts.filter(p => p.status !== false).length;
+      activeProducts.textContent = allProducts.filter(p => p.ativo !== false).length;
     }
 
     // ============================================
@@ -491,27 +896,21 @@
     function applyFilters() {
       const search = searchInput.value.toLowerCase().trim();
       const unit = filterUnit.value;
+      const status = filterStatus.value;
 
       filteredProducts = allProducts.filter(p => {
         const matchSearch = !search || p.descricao.toLowerCase().includes(search);
         const matchUnit = !unit || p.unidade === unit;
-        return matchSearch && matchUnit;
+        let matchStatus = true;
+        if (status === 'ativo') matchStatus = p.ativo !== false;
+        else if (status === 'inativo') matchStatus = p.ativo === false;
+        return matchSearch && matchUnit && matchStatus;
       });
-
       renderTable();
     }
 
-    searchInput.addEventListener('input', applyFilters);
-    filterUnit.addEventListener('change', applyFilters);
-
-    clearFiltersBtn.addEventListener('click', () => {
-      searchInput.value = '';
-      filterUnit.value = '';
-      applyFilters();
-    });
-
     // ============================================
-    // CRUD - ADICIONAR/EDITAR
+    // CRUD
     // ============================================
     productForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -520,14 +919,14 @@
       const descricao = formDescricao.value.trim();
       const preco = parseFloat(formPreco.value);
       const unidade = formUnidade.value;
+      const ativo = formStatus.value === 'true';
 
       if (!descricao || !preco || !unidade) {
         showModalMessage('❌ Preencha todos os campos!', 'error');
         return;
       }
-
       if (preco <= 0) {
-        showModalMessage('❌ O preço deve ser maior que zero!', 'error');
+        showModalMessage('❌ Preço deve ser maior que zero!', 'error');
         return;
       }
 
@@ -540,81 +939,32 @@
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
         if (id) {
-          // EDITAR
           const { error } = await supabase
             .from('produtos')
-            .update({ 
-              descricao, 
-              preco: preco.toFixed(2), 
-              unidade 
-            })
+            .update({ descricao, preco: preco.toFixed(2), unidade, ativo })
             .eq('id', id);
-
           if (error) throw error;
-          showModalMessage('✅ Produto atualizado com sucesso!', 'success');
-
+          showModalMessage('✅ Atualizado!', 'success');
         } else {
-          // ADICIONAR
           const { error } = await supabase
             .from('produtos')
-            .insert([{ descricao, preco: preco.toFixed(2), unidade }]);
-
+            .insert([{ descricao, preco: preco.toFixed(2), unidade, ativo }]);
           if (error) throw error;
-          showModalMessage('✅ Produto adicionado com sucesso!', 'success');
+          showModalMessage('✅ Adicionado!', 'success');
         }
 
-        setTimeout(() => {
+        setTimeout(async () => {
           closeModal();
-          loadProducts();
-        }, 1000);
+          await loadProducts();
+        }, 800);
 
       } catch (err) {
-        console.error('Erro:', err);
-        showModalMessage(`❌ ${err.message || 'Erro ao salvar produto'}`, 'error');
+        showModalMessage(`❌ ${err.message}`, 'error');
       } finally {
         submitBtn.disabled = false;
         submitBtn.textContent = originalText;
       }
     });
-
-    // ============================================
-    // CRUD - EDITAR
-    // ============================================
-    function editProduct(id) {
-      const product = allProducts.find(p => p.id === id);
-      if (product) {
-        openModal(product);
-      }
-    }
-
-    // ============================================
-    // CRUD - DELETAR
-    // ============================================
-    async function deleteProduct(id) {
-      const product = allProducts.find(p => p.id === id);
-      if (!product) return;
-      
-      if (!confirm(`Tem certeza que deseja excluir o produto "${product.descricao}"?`)) {
-        return;
-      }
-
-      try {
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-        const { error } = await supabase
-          .from('produtos')
-          .delete()
-          .eq('id', id);
-
-        if (error) throw error;
-        
-        alert('✅ Produto excluído com sucesso!');
-        loadProducts();
-
-      } catch (err) {
-        console.error('Erro ao excluir:', err);
-        alert(`❌ Erro ao excluir: ${err.message}`);
-      }
-    }
 
     // ============================================
     // EXPORTAR
@@ -624,16 +974,13 @@
         alert('Nenhum produto para exportar!');
         return;
       }
-
-      const headers = ['ID', 'Descrição', 'Unidade', 'Preço', 'Criado em'];
+      const headers = ['ID', 'Descrição', 'Unidade', 'Preço', 'Status', 'Criado em'];
       const rows = allProducts.map(p => [
-        p.id,
-        p.descricao,
-        p.unidade || '',
+        p.id, p.descricao, p.unidade || '',
         parseFloat(p.preco).toFixed(2),
+        p.ativo !== false ? 'Ativo' : 'Oculto',
         formatDate(p.criado_em)
       ]);
-
       const csv = [headers, ...rows].map(row => row.join(';')).join('\n');
       const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
@@ -643,34 +990,38 @@
       URL.revokeObjectURL(link.href);
     }
 
-    exportBtn.addEventListener('click', exportToCSV);
+    // ============================================
+    // EVENTOS
+    // ============================================
+    searchInput.addEventListener('input', applyFilters);
+    filterUnit.addEventListener('change', applyFilters);
+    filterStatus.addEventListener('change', applyFilters);
 
-    // ============================================
-    // EVENTOS DO MODAL
-    // ============================================
+    clearFiltersBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      filterUnit.value = '';
+      filterStatus.value = '';
+      applyFilters();
+    });
+
+    refreshBtn.addEventListener('click', loadProducts);
+    exportBtn.addEventListener('click', exportToCSV);
     openAddModalBtn.addEventListener('click', () => openModal(null));
     closeModalBtn.addEventListener('click', closeModal);
     cancelModalBtn.addEventListener('click', closeModal);
 
-    // Fechar ao clicar fora
     productModal.addEventListener('click', (e) => {
       if (e.target === productModal) closeModal();
     });
 
-    // Fechar com ESC
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && !productModal.classList.contains('hidden')) {
-        closeModal();
-      }
+      if (e.key === 'Escape' && !productModal.classList.contains('hidden')) closeModal();
     });
 
     // ============================================
     // INICIALIZAR
     // ============================================
     loadProducts();
-
-    // Recarregar a cada 30 segundos (opcional)
-    // setInterval(loadProducts, 30000);
   </script>
 </body>
 </html>

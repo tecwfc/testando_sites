@@ -1,14 +1,19 @@
-const CACHE_NAME = 'glga-v1';
-const ASSETS = [
-  'index.html',
-  'https://cdn.tailwindcss.com',
-  'https://raw.githack.com/eKoopmans/html2pdf/master/dist/html2pdf.bundle.js'
+const CACHE_NAME = 'wr-aroma-v1';
+const assets = [
+  './',
+  './index.html',
+  './script.js',
+  './assets/Logo.png'
 ];
 
-self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS)));
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => cache.addAll(assets))
+  );
 });
 
-self.addEventListener('fetch', (e) => {
-  e.respondWith(caches.match(e.request).then(res => res || fetch(e.request)));
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => response || fetch(event.request))
+  );
 });

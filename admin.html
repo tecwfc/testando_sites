@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Gerenciar Produtos</title>
+  
+  <!-- Supabase Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    .sidebar {
+      background: linear-gradient(180deg, #0b6e3a 0%, #064a26 100%);
+    }
+    .sidebar-link {
+      transition: all 0.2s;
+    }
+    .sidebar-link:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateX(4px);
+    }
+    .sidebar-link.active {
+      background: rgba(255,255,255,0.2);
+      border-left: 3px solid #4ade80;
+    }
+    .card-hover {
+      transition: all 0.2s;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .status-badge {
+      padding: 2px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-active { background: #dcfce7; color: #166534; }
+    .status-inactive { background: #fee2e2; color: #991b1b; }
+    
+    .modal-overlay {
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+    }
+    
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-content {
+      animation: slideIn 0.3s ease;
+    }
+    
+    .btn-primary {
+      background: #0b6e3a;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: #0f8b4b;
+      transform: scale(1.02);
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+    .btn-sm {
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 text-white flex-shrink-0 h-screen overflow-y-auto">
+    <div class="p-6 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <span class="text-primary text-xl font-bold">IP</span>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg">Ivo Pita</h1>
+          <p class="text-xs opacity-70">Indústria GLGA</p>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="p-4 space-y-1">
+      <a href="#" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg text-sm">
+        <span>📦</span> Produtos
+      </a>
+      <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70">
+        <span>📊</span> Dashboard
+      </a>
+      <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70">
+        <span>📋</span> Pedidos
+      </a>
+      <a href="#" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70">
+        <span>⚙️</span> Configurações
+      </a>
+    </nav>
+    
+    <div class="absolute bottom-0 p-4 border-t border-white/10 w-64">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100 transition">
+        <span>🏠</span> Voltar ao Site
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto p-6">
+    <!-- Header -->
+    <div class="flex justify-between items-center mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">📦 Gerenciar Produtos</h2>
+        <p class="text-sm text-gray-500">Gerencie todos os produtos do seu catálogo</p>
+      </div>
+      <div class="flex gap-3">
+        <button id="exportBtn" class="btn-secondary text-sm flex items-center gap-2">
+          📥 Exportar
+        </button>
+        <button id="openAddModalBtn" class="btn-primary flex items-center gap-2">
+          <span class="text-lg">+</span> Novo Produto
+        </button>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-2xl p-4 shadow-sm card-hover">
+        <p class="text-sm text-gray-500">Total Produtos</p>
+        <p class="text-2xl font-bold text-gray-800" id="totalProducts">0</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 shadow-sm card-hover">
+        <p class="text-sm text-gray-500">Preço Médio</p>
+        <p class="text-2xl font-bold text-green-600" id="avgPrice">R$ 0,00</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 shadow-sm card-hover">
+        <p class="text-sm text-gray-500">Produtos Ativos</p>
+        <p class="text-2xl font-bold text-blue-600" id="activeProducts">0</p>
+      </div>
+      <div class="bg-white rounded-2xl p-4 shadow-sm card-hover">
+        <p class="text-sm text-gray-500">Última Atualização</p>
+        <p class="text-sm font-semibold text-gray-700" id="lastUpdate">-</p>
+      </div>
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="bg-white rounded-2xl p-4 shadow-sm mb-6">
+      <div class="flex flex-wrap gap-4 items-center">
+        <div class="flex-1 min-w-[200px]">
+          <input type="text" id="searchInput" placeholder="🔍 Buscar produtos..." 
+                 class="w-full px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none">
+        </div>
+        <div class="flex gap-2">
+          <select id="filterUnit" class="px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none bg-white">
+            <option value="">Todas Unidades</option>
+            <option value="LT">LT</option>
+            <option value="KG">KG</option>
+            <option value="UN">UN</option>
+            <option value="MT">MT</option>
+            <option value="M2">M²</option>
+            <option value="M3">M³</option>
+            <option value="TON">TON</option>
+            <option value="G">G</option>
+            <option value="ML">ML</option>
+            <option value="PC">PC</option>
+          </select>
+          <button id="clearFiltersBtn" class="btn-secondary text-sm">Limpar Filtros</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Table -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">ID</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Produto</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Unidade</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Preço</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Criado em</th>
+              <th class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="productsTableBody" class="divide-y divide-gray-100">
+            <!-- Produtos serão inseridos aqui -->
+          </tbody>
+        </table>
+      </div>
+      <div id="loadingIndicator" class="text-center py-8 text-gray-400">
+        ⏳ Carregando produtos...
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal Adicionar/Editar Produto -->
+  <div id="productModal" class="fixed inset-0 z-50 hidden modal-overlay flex items-center justify-center">
+    <div class="modal-content bg-white rounded-3xl p-6 w-[min(500px,95%)] shadow-2xl">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-xl font-bold text-gray-800" id="modalTitle">➕ Adicionar Produto</h3>
+        <button id="closeModalBtn" class="text-gray-400 hover:text-gray-600 text-3xl leading-none transition">&times;</button>
+      </div>
+      
+      <form id="productForm" class="space-y-4">
+        <input type="hidden" id="editProductId" value="">
+        
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">
+            Descrição do Produto <span class="text-red-500">*</span>
+          </label>
+          <input type="text" id="formDescricao" required 
+                 placeholder="Ex: Ácido Sulfúrico 98%"
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">
+            Preço (R$) <span class="text-red-500">*</span>
+          </label>
+          <input type="number" id="formPreco" step="0.01" required 
+                 placeholder="Ex: 45.50"
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none">
+        </div>
+        
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">
+            Unidade <span class="text-red-500">*</span>
+          </label>
+          <select id="formUnidade" required 
+                  class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none bg-white">
+            <option value="">Selecione...</option>
+            <option value="LT">LT - Litro</option>
+            <option value="KG">KG - Quilograma</option>
+            <option value="UN">UN - Unidade</option>
+            <option value="MT">MT - Metro</option>
+            <option value="M2">M² - Metro Quadrado</option>
+            <option value="M3">M³ - Metro Cúbico</option>
+            <option value="TON">TON - Tonelada</option>
+            <option value="G">G - Grama</option>
+            <option value="ML">ML - Mililitro</option>
+            <option value="PC">PC - Peça</option>
+          </select>
+        </div>
+        
+        <div id="modalMessage" class="hidden text-sm p-3 rounded-2xl"></div>
+        
+        <div class="flex gap-3 pt-2">
+          <button type="submit" class="flex-1 btn-primary py-3 text-sm font-semibold" id="formSubmitBtn">
+            ✅ Salvar Produto
+          </button>
+          <button type="button" id="cancelModalBtn" 
+                  class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-3 rounded-full text-sm font-semibold transition">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // ============================================
+    // CONFIGURAÇÃO
+    // ============================================
+    const SUPABASE_URL = "https://pshijarnndbbmpspxinm.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzaGlqYXJubmRiYm1wc3B4aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5Nzc3MjUsImV4cCI6MjEwMDU1MzcyNX0.Bj9H5L0x70hpUOj4tSQu3oXwWpY6yoHgQcDGMAejg8o";
+
+    // ============================================
+    // VARIÁVEIS
+    // ============================================
+    let allProducts = [];
+    let filteredProducts = [];
+
+    // Elementos
+    const tableBody = document.getElementById('productsTableBody');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const searchInput = document.getElementById('searchInput');
+    const filterUnit = document.getElementById('filterUnit');
+    const clearFiltersBtn = document.getElementById('clearFiltersBtn');
+    const openAddModalBtn = document.getElementById('openAddModalBtn');
+    const closeModalBtn = document.getElementById('closeModalBtn');
+    const cancelModalBtn = document.getElementById('cancelModalBtn');
+    const productModal = document.getElementById('productModal');
+    const productForm = document.getElementById('productForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const editProductId = document.getElementById('editProductId');
+    const formDescricao = document.getElementById('formDescricao');
+    const formPreco = document.getElementById('formPreco');
+    const formUnidade = document.getElementById('formUnidade');
+    const modalMessage = document.getElementById('modalMessage');
+    const formSubmitBtn = document.getElementById('formSubmitBtn');
+    const exportBtn = document.getElementById('exportBtn');
+
+    const totalProducts = document.getElementById('totalProducts');
+    const avgPrice = document.getElementById('avgPrice');
+    const activeProducts = document.getElementById('activeProducts');
+    const lastUpdate = document.getElementById('lastUpdate');
+
+    // ============================================
+    // FUNÇÕES
+    // ============================================
+    function formatCurrency(value) {
+      return 'R$ ' + Number(value).toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function formatDate(dateStr) {
+      if (!dateStr) return '-';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function showModalMessage(text, type = 'success') {
+      modalMessage.textContent = text;
+      modalMessage.className = 'text-sm p-3 rounded-2xl ' + 
+        (type === 'success' ? 'bg-green-50 text-green-700' : 
+         type === 'error' ? 'bg-red-50 text-red-700' : 
+         'bg-yellow-50 text-yellow-700');
+      modalMessage.classList.remove('hidden');
+    }
+
+    function hideModalMessage() {
+      modalMessage.classList.add('hidden');
+    }
+
+    function openModal(product = null) {
+      hideModalMessage();
+      if (product) {
+        modalTitle.textContent = '✏️ Editar Produto';
+        editProductId.value = product.id;
+        formDescricao.value = product.descricao || '';
+        formPreco.value = product.preco || '';
+        formUnidade.value = product.unidade || '';
+        formSubmitBtn.textContent = '💾 Atualizar Produto';
+      } else {
+        modalTitle.textContent = '➕ Adicionar Produto';
+        editProductId.value = '';
+        formDescricao.value = '';
+        formPreco.value = '';
+        formUnidade.value = '';
+        formSubmitBtn.textContent = '✅ Adicionar Produto';
+      }
+      productModal.classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      productModal.classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      hideModalMessage();
+    }
+
+    // ============================================
+    // CARREGAR PRODUTOS
+    // ============================================
+    async function loadProducts() {
+      loadingIndicator.classList.remove('hidden');
+      tableBody.innerHTML = '';
+
+      try {
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { data, error } = await supabase
+          .from('produtos')
+          .select('*')
+          .order('descricao', { ascending: true });
+
+        if (error) throw error;
+
+        allProducts = data || [];
+        filteredProducts = [...allProducts];
+        
+        // Atualizar stats
+        updateStats();
+        
+        // Renderizar tabela
+        renderTable();
+        
+        // Atualizar último update
+        lastUpdate.textContent = new Date().toLocaleString('pt-BR');
+
+      } catch (err) {
+        console.error('Erro ao carregar produtos:', err);
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center py-8 text-red-500">
+              ❌ Erro ao carregar produtos: ${err.message}
+            </td>
+          </tr>
+        `;
+      } finally {
+        loadingIndicator.classList.add('hidden');
+      }
+    }
+
+    // ============================================
+    // RENDER TABELA
+    // ============================================
+    function renderTable() {
+      if (!filteredProducts.length) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="7" class="text-center py-8 text-gray-400">
+              📭 Nenhum produto encontrado
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tableBody.innerHTML = filteredProducts.map(p => `
+        <tr class="hover:bg-gray-50 transition">
+          <td class="px-6 py-3 text-sm text-gray-500">#${p.id}</td>
+          <td class="px-6 py-3">
+            <div class="font-medium text-gray-800">${escapeHtml(p.descricao)}</div>
+          </td>
+          <td class="px-6 py-3">
+            <span class="status-badge bg-blue-50 text-blue-700">${escapeHtml(p.unidade || '---')}</span>
+          </td>
+          <td class="px-6 py-3 font-semibold text-green-700">${formatCurrency(p.preco)}</td>
+          <td class="px-6 py-3">
+            <span class="status-badge status-active">Ativo</span>
+          </td>
+          <td class="px-6 py-3 text-sm text-gray-500">${formatDate(p.criado_em)}</td>
+          <td class="px-6 py-3">
+            <div class="flex justify-center gap-2">
+              <button onclick="editProduct(${p.id})" 
+                      class="btn-secondary btn-sm flex items-center gap-1">
+                ✏️ Editar
+              </button>
+              <button onclick="deleteProduct(${p.id})" 
+                      class="btn-danger btn-sm flex items-center gap-1">
+                🗑️
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    function escapeHtml(text) {
+      if (!text) return '';
+      return String(text).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+    }
+
+    // ============================================
+    // STATS
+    // ============================================
+    function updateStats() {
+      totalProducts.textContent = allProducts.length;
+      
+      const prices = allProducts.map(p => parseFloat(p.preco) || 0);
+      const avg = prices.length ? prices.reduce((a, b) => a + b, 0) / prices.length : 0;
+      avgPrice.textContent = formatCurrency(avg);
+      
+      activeProducts.textContent = allProducts.filter(p => p.status !== false).length;
+    }
+
+    // ============================================
+    // FILTROS
+    // ============================================
+    function applyFilters() {
+      const search = searchInput.value.toLowerCase().trim();
+      const unit = filterUnit.value;
+
+      filteredProducts = allProducts.filter(p => {
+        const matchSearch = !search || p.descricao.toLowerCase().includes(search);
+        const matchUnit = !unit || p.unidade === unit;
+        return matchSearch && matchUnit;
+      });
+
+      renderTable();
+    }
+
+    searchInput.addEventListener('input', applyFilters);
+    filterUnit.addEventListener('change', applyFilters);
+
+    clearFiltersBtn.addEventListener('click', () => {
+      searchInput.value = '';
+      filterUnit.value = '';
+      applyFilters();
+    });
+
+    // ============================================
+    // CRUD - ADICIONAR/EDITAR
+    // ============================================
+    productForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const id = editProductId.value;
+      const descricao = formDescricao.value.trim();
+      const preco = parseFloat(formPreco.value);
+      const unidade = formUnidade.value;
+
+      if (!descricao || !preco || !unidade) {
+        showModalMessage('❌ Preencha todos os campos!', 'error');
+        return;
+      }
+
+      if (preco <= 0) {
+        showModalMessage('❌ O preço deve ser maior que zero!', 'error');
+        return;
+      }
+
+      const submitBtn = formSubmitBtn;
+      const originalText = submitBtn.textContent;
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Salvando...';
+
+      try {
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        if (id) {
+          // EDITAR
+          const { error } = await supabase
+            .from('produtos')
+            .update({ 
+              descricao, 
+              preco: preco.toFixed(2), 
+              unidade 
+            })
+            .eq('id', id);
+
+          if (error) throw error;
+          showModalMessage('✅ Produto atualizado com sucesso!', 'success');
+
+        } else {
+          // ADICIONAR
+          const { error } = await supabase
+            .from('produtos')
+            .insert([{ descricao, preco: preco.toFixed(2), unidade }]);
+
+          if (error) throw error;
+          showModalMessage('✅ Produto adicionado com sucesso!', 'success');
+        }
+
+        setTimeout(() => {
+          closeModal();
+          loadProducts();
+        }, 1000);
+
+      } catch (err) {
+        console.error('Erro:', err);
+        showModalMessage(`❌ ${err.message || 'Erro ao salvar produto'}`, 'error');
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
+      }
+    });
+
+    // ============================================
+    // CRUD - EDITAR
+    // ============================================
+    function editProduct(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (product) {
+        openModal(product);
+      }
+    }
+
+    // ============================================
+    // CRUD - DELETAR
+    // ============================================
+    async function deleteProduct(id) {
+      const product = allProducts.find(p => p.id === id);
+      if (!product) return;
+      
+      if (!confirm(`Tem certeza que deseja excluir o produto "${product.descricao}"?`)) {
+        return;
+      }
+
+      try {
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        const { error } = await supabase
+          .from('produtos')
+          .delete()
+          .eq('id', id);
+
+        if (error) throw error;
+        
+        alert('✅ Produto excluído com sucesso!');
+        loadProducts();
+
+      } catch (err) {
+        console.error('Erro ao excluir:', err);
+        alert(`❌ Erro ao excluir: ${err.message}`);
+      }
+    }
+
+    // ============================================
+    // EXPORTAR
+    // ============================================
+    function exportToCSV() {
+      if (!allProducts.length) {
+        alert('Nenhum produto para exportar!');
+        return;
+      }
+
+      const headers = ['ID', 'Descrição', 'Unidade', 'Preço', 'Criado em'];
+      const rows = allProducts.map(p => [
+        p.id,
+        p.descricao,
+        p.unidade || '',
+        parseFloat(p.preco).toFixed(2),
+        formatDate(p.criado_em)
+      ]);
+
+      const csv = [headers, ...rows].map(row => row.join(';')).join('\n');
+      const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = `produtos_${new Date().toISOString().split('T')[0]}.csv`;
+      link.click();
+      URL.revokeObjectURL(link.href);
+    }
+
+    exportBtn.addEventListener('click', exportToCSV);
+
+    // ============================================
+    // EVENTOS DO MODAL
+    // ============================================
+    openAddModalBtn.addEventListener('click', () => openModal(null));
+    closeModalBtn.addEventListener('click', closeModal);
+    cancelModalBtn.addEventListener('click', closeModal);
+
+    // Fechar ao clicar fora
+    productModal.addEventListener('click', (e) => {
+      if (e.target === productModal) closeModal();
+    });
+
+    // Fechar com ESC
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !productModal.classList.contains('hidden')) {
+        closeModal();
+      }
+    });
+
+    // ============================================
+    // INICIALIZAR
+    // ============================================
+    loadProducts();
+
+    // Recarregar a cada 30 segundos (opcional)
+    // setInterval(loadProducts, 30000);
+  </script>
+</body>
+</html>

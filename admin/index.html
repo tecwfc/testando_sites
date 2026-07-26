@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin WR Aromatizantes - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/admin.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6d28d9 0%, #2e1065 100%);
+            padding: 20px;
+        }
+        .login-container {
+            background: white;
+            border-radius: 30px;
+            padding: 50px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-logo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+        .login-logo h1 {
+            font-size: 24px;
+            color: #1a1a2e;
+        }
+        .login-logo p {
+            color: #666;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #6d28d9;
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+        }
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: #6d28d9;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-login:hover {
+            background: #5b21b6;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(109, 40, 217, 0.3);
+        }
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+        .alert-success {
+            background: #d1fae5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            display: block;
+        }
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #888;
+            font-size: 13px;
+        }
+        .login-footer a {
+            color: #6d28d9;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        .senha-toggle {
+            position: relative;
+        }
+        .senha-toggle input {
+            padding-right: 50px;
+        }
+        .senha-toggle button {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        .senha-toggle button:hover {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="../assets/Logo.png" alt="WR Aromatizantes">
+            <h1>WR Aromatizantes</h1>
+            <p>Painel Administrativo</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> E-mail</label>
+                <input type="email" id="email" placeholder="admin@wraromatizantes.com" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="senha"><i class="fas fa-lock"></i> Senha</label>
+                <div class="senha-toggle">
+                    <input type="password" id="senha" placeholder="Digite sua senha" required>
+                    <button type="button" onclick="toggleSenha()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login" id="btnLogin">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <p>Credenciais padrão: admin@wraromatizantes.com / admin123</p>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import { login } from './auth.js';
+
+        const form = document.getElementById('loginForm');
+        const email = document.getElementById('email');
+        const senha = document.getElementById('senha');
+        const alertDiv = document.getElementById('alert');
+        const btnLogin = document.getElementById('btnLogin');
+
+        // Verificar se já está logado
+        if (sessionStorage.getItem('usuario_logado')) {
+            window.location.href = 'dashboard.html';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            alertDiv.className = 'alert';
+            alertDiv.style.display = 'none';
+            btnLogin.disabled = true;
+            btnLogin.innerHTML = '<span class="spinner"></span> Entrando...';
+
+            try {
+                await login(email.value, senha.value);
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alertDiv.className = 'alert alert-error';
+                alertDiv.style.display = 'block';
+                alertDiv.textContent = error.message || 'Erro ao fazer login';
+                btnLogin.disabled = false;
+                btnLogin.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            }
+        });
+
+        window.toggleSenha = function() {
+            const input = document.getElementById('senha');
+            const icon = document.querySelector('.senha-toggle button i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        };
+    </script>
+</body>
+</html>

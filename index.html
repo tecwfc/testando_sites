@@ -837,68 +837,74 @@
     // ============================================
     // FETCH PRODUTOS
     // ============================================
-    async function fetchProducts() {
-      formSkeleton.classList.remove("hidden");
-      productSelectionSection.classList.add("hidden");
-      productListEl.innerHTML = '<div class="text-sm text-gray-400 p-3">Carregando produtos...</div>';
+    // ============================================
+// FETCH PRODUTOS - APENAS ATIVOS
+// ============================================
+async function fetchProducts() {
+  formSkeleton.classList.remove("hidden");
+  productSelectionSection.classList.add("hidden");
+  productListEl.innerHTML = '<div class="text-sm text-gray-400 p-3">Carregando produtos...</div>';
 
-      try {
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  try {
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-        const { data, error } = await supabase
-          .from('produtos')
-          .select('*')
-          .order('descricao', { ascending: true });
+    // 🔥 Buscar APENAS produtos com ativo = true
+    const { data, error } = await supabase
+      .from('produtos')
+      .select('*')
+      .eq('ativo', true)  // ← FILTRO IMPORTANTE
+      .order('descricao', { ascending: true });
 
-        if (error) {
-          console.error('❌ Erro na consulta:', error);
-          throw error;
-        }
-
-        console.log('📦 Dados recebidos do Supabase:', data);
-
-        if (data && data.length > 0) {
-          products = data.map(p => ({
-            description: p.descricao || '',
-            price: parseFloat(p.preco) || 0,
-            unidade: p.unidade || ''
-          }));
-          showMsg(`✅ ${products.length} produtos carregados do Supabase!`, "success");
-        } else {
-          console.warn('⚠️ Nenhum produto encontrado no banco');
-          products = [
-            { description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "LT" },
-            { description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "KG" },
-            { description: "Cloro Líquido", price: 52.80, unidade: "LT" },
-            { description: "Ácido Clorídrico 37%", price: 29.90, unidade: "LT" },
-            { description: "Peróxido de Hidrogênio 50%", price: 67.30, unidade: "LT" },
-            { description: "Soda Cáustica em Escamas", price: 41.00, unidade: "KG" },
-            { description: "Ácido Nítrico 65%", price: 58.60, unidade: "LT" },
-            { description: "Sulfato de Alumínio", price: 33.40, unidade: "KG" }
-          ];
-          showMsg("⚠️ Usando produtos de exemplo (fallback)", "info");
-        }
-
-      } catch (err) {
-        console.error('❌ Erro ao carregar produtos:', err);
-        products = [
-          { description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "LT" },
-          { description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "KG" },
-          { description: "Cloro Líquido", price: 52.80, unidade: "LT" },
-          { description: "Ácido Clorídrico 37%", price: 29.90, unidade: "LT" },
-          { description: "Peróxido de Hidrogênio 50%", price: 67.30, unidade: "LT" },
-          { description: "Soda Cáustica em Escamas", price: 41.00, unidade: "KG" },
-          { description: "Ácido Nítrico 65%", price: 58.60, unidade: "LT" },
-          { description: "Sulfato de Alumínio", price: 33.40, unidade: "KG" }
-        ];
-        showMsg("⚠️ Usando produtos de exemplo (fallback)", "info");
-      } finally {
-        formSkeleton.classList.add("hidden");
-        productSelectionSection.classList.remove("hidden");
-        populateProductList();
-        renderCart();
-      }
+    if (error) {
+      console.error('❌ Erro na consulta:', error);
+      throw error;
     }
+
+    console.log('📦 Produtos ativos carregados:', data);
+
+    if (data && data.length > 0) {
+      products = data.map(p => ({
+        description: p.descricao || '',
+        price: parseFloat(p.preco) || 0,
+        unidade: p.unidade || ''
+      }));
+      showMsg(`✅ ${products.length} produtos ativos carregados!`, "success");
+    } else {
+      // Fallback com produtos de exemplo (todos ativos)
+      products = [
+        { description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "LT" },
+        { description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "KG" },
+        { description: "Cloro Líquido", price: 52.80, unidade: "LT" },
+        { description: "Ácido Clorídrico 37%", price: 29.90, unidade: "LT" },
+        { description: "Peróxido de Hidrogênio 50%", price: 67.30, unidade: "LT" },
+        { description: "Soda Cáustica em Escamas", price: 41.00, unidade: "KG" },
+        { description: "Ácido Nítrico 65%", price: 58.60, unidade: "LT" },
+        { description: "Sulfato de Alumínio", price: 33.40, unidade: "KG" }
+      ];
+      showMsg("⚠️ Usando produtos de exemplo (fallback)", "info");
+    }
+
+  } catch (err) {
+    console.error('❌ Erro ao carregar produtos:', err);
+    // Fallback
+    products = [
+      { description: "Ácido Sulfúrico 98%", price: 45.50, unidade: "LT" },
+      { description: "Hidróxido de Sódio 99%", price: 38.20, unidade: "KG" },
+      { description: "Cloro Líquido", price: 52.80, unidade: "LT" },
+      { description: "Ácido Clorídrico 37%", price: 29.90, unidade: "LT" },
+      { description: "Peróxido de Hidrogênio 50%", price: 67.30, unidade: "LT" },
+      { description: "Soda Cáustica em Escamas", price: 41.00, unidade: "KG" },
+      { description: "Ácido Nítrico 65%", price: 58.60, unidade: "LT" },
+      { description: "Sulfato de Alumínio", price: 33.40, unidade: "KG" }
+    ];
+    showMsg("⚠️ Usando produtos de exemplo (fallback)", "info");
+  } finally {
+    formSkeleton.classList.add("hidden");
+    productSelectionSection.classList.remove("hidden");
+    populateProductList();
+    renderCart();
+  }
+}
 
     // ============================================
     // GERAR PDF

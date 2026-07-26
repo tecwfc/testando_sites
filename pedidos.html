@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedidos - Ivo Pita</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    .sidebar {
+      background: linear-gradient(180deg, #0b6e3a 0%, #064a26 100%);
+    }
+    .sidebar-link {
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .sidebar-link:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateX(4px);
+    }
+    .sidebar-link.active {
+      background: rgba(255,255,255,0.2);
+      border-left: 3px solid #4ade80;
+    }
+    .status-badge {
+      padding: 2px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-pendente { background: #fef3c7; color: #92400e; }
+    .status-aprovado { background: #dcfce7; color: #166534; }
+    .status-cancelado { background: #fee2e2; color: #991b1b; }
+    .status-entregue { background: #dbeafe; color: #1e40af; }
+    
+    .btn-primary {
+      background: #0b6e3a;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: #0f8b4b;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+    .btn-sm {
+      padding: 4px 12px;
+      font-size: 12px;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 text-white flex-shrink-0 h-screen overflow-y-auto">
+    <div class="p-6 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <span class="text-primary text-xl font-bold">IP</span>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg">Ivo Pita</h1>
+          <p class="text-xs opacity-70">Indústria GLGA</p>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="p-4 space-y-1">
+      <a href="dashboard.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
+        <span>📊</span> Dashboard
+      </a>
+      <a href="admin.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
+        <span>📦</span> Produtos
+      </a>
+      <a href="pedidos.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg text-sm">
+        <span>📋</span> Pedidos
+      </a>
+      <a href="configuracoes.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
+        <span>⚙️</span> Configurações
+      </a>
+    </nav>
+    
+    <div class="absolute bottom-0 p-4 border-t border-white/10 w-64">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100 transition">
+        <span>🏠</span> Voltar ao Site
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto p-6">
+    <div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+      <div>
+        <h2 class="text-2xl font-bold text-gray-800">📋 Pedidos</h2>
+        <p class="text-sm text-gray-500">Gerencie todos os pedidos</p>
+      </div>
+      <div class="flex gap-2">
+        <select id="filtroStatus" class="px-4 py-2 rounded-xl border border-gray-200 focus:ring-2 focus:ring-green-300 outline-none bg-white">
+          <option value="">Todos os Status</option>
+          <option value="pendente">Pendente</option>
+          <option value="aprovado">Aprovado</option>
+          <option value="entregue">Entregue</option>
+          <option value="cancelado">Cancelado</option>
+        </select>
+        <button id="refreshBtn" class="btn-primary flex items-center gap-1">
+          🔄 Atualizar
+        </button>
+      </div>
+    </div>
+
+    <!-- Tabela de Pedidos -->
+    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Pedido</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Data</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Qtd Itens</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Total</th>
+              <th class="text-left px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Status</th>
+              <th class="text-center px-6 py-3 text-xs font-semibold text-gray-500 uppercase">Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaPedidos" class="divide-y divide-gray-100">
+            <tr>
+              <td colspan="6" class="text-center py-8 text-gray-400">Carregando pedidos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://pshijarnndbbmpspxinm.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzaGlqYXJubmRiYm1wc3B4aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5Nzc3MjUsImV4cCI6MjEwMDU1MzcyNX0.Bj9H5L0x70hpUOj4tSQu3oXwWpY6yoHgQcDGMAejg8o";
+
+    let todosPedidos = [];
+
+    async function carregarPedidos() {
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const tbody = document.getElementById('tabelaPedidos');
+      tbody.innerHTML = '<tr><td colspan="6" class="text-center py-8 text-gray-400">Carregando...</td></tr>';
+
+      try {
+        const { data: pedidos, error } = await supabase
+          .from('pedidos')
+          .select('*')
+          .order('data_pedido', { ascending: false });
+
+        if (error) throw error;
+
+        todosPedidos = pedidos || [];
+        renderizarPedidos();
+
+      } catch (err) {
+        console.error('Erro ao carregar pedidos:', err);
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-red-500">❌ Erro ao carregar pedidos</td></tr>`;
+      }
+    }
+
+    function renderizarPedidos() {
+      const tbody = document.getElementById('tabelaPedidos');
+      const filtroStatus = document.getElementById('filtroStatus').value;
+      
+      let filtrados = todosPedidos;
+      if (filtroStatus) {
+        filtrados = todosPedidos.filter(p => p.status === filtroStatus);
+      }
+
+      if (filtrados.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center py-8 text-gray-400">Nenhum pedido encontrado</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtrados.map(p => `
+        <tr class="hover:bg-gray-50 transition">
+          <td class="px-6 py-3 font-medium text-gray-800">${p.numero_pedido || 'N/A'}</td>
+          <td class="px-6 py-3 text-sm text-gray-500">${new Date(p.data_pedido).toLocaleDateString('pt-BR')}</td>
+          <td class="px-6 py-3 text-sm text-gray-500">${p.quantidade_total || 0}</td>
+          <td class="px-6 py-3 font-semibold text-green-700">
+            R$ ${(parseFloat(p.valor_total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+          </td>
+          <td class="px-6 py-3">
+            <span class="status-badge status-${p.status || 'pendente'}">
+              ${p.status || 'Pendente'}
+            </span>
+          </td>
+          <td class="px-6 py-3">
+            <div class="flex justify-center gap-2">
+              <button onclick="atualizarStatus('${p.id}', 'aprovado')" class="btn-secondary btn-sm">✅ Aprovar</button>
+              <button onclick="atualizarStatus('${p.id}', 'entregue')" class="btn-secondary btn-sm">📦 Entregar</button>
+              <button onclick="atualizarStatus('${p.id}', 'cancelado')" class="btn-secondary btn-sm" style="background:#fee2e2;color:#991b1b;">❌ Cancelar</button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    async function atualizarStatus(id, novoStatus) {
+      if (!confirm(`Deseja alterar o status para "${novoStatus}"?`)) return;
+
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
+      try {
+        const { error } = await supabase
+          .from('pedidos')
+          .update({ status: novoStatus })
+          .eq('id', id);
+
+        if (error) throw error;
+
+        alert('✅ Status atualizado com sucesso!');
+        carregarPedidos();
+
+      } catch (err) {
+        console.error('Erro:', err);
+        alert('❌ Erro ao atualizar status: ' + err.message);
+      }
+    }
+
+    // Filtro
+    document.getElementById('filtroStatus').addEventListener('change', renderizarPedidos);
+    document.getElementById('refreshBtn').addEventListener('click', carregarPedidos);
+
+    // Carregar
+    carregarPedidos();
+  </script>
+</body>
+</html>

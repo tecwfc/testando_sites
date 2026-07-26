@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configurações - Ivo Pita</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    .sidebar {
+      background: linear-gradient(180deg, #0b6e3a 0%, #064a26 100%);
+    }
+    .sidebar-link {
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .sidebar-link:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateX(4px);
+    }
+    .sidebar-link.active {
+      background: rgba(255,255,255,0.2);
+      border-left: 3px solid #4ade80;
+    }
+    .config-card {
+      transition: all 0.2s;
+    }
+    .config-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    }
+    .btn-primary {
+      background: #0b6e3a;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-primary:hover {
+      background: #0f8b4b;
+    }
+    .btn-danger {
+      background: #dc2626;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-danger:hover {
+      background: #b91c1c;
+    }
+    .btn-secondary {
+      background: #e5e7eb;
+      color: #374151;
+      padding: 8px 20px;
+      border-radius: 30px;
+      transition: all 0.2s;
+      border: none;
+      cursor: pointer;
+    }
+    .btn-secondary:hover {
+      background: #d1d5db;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 text-white flex-shrink-0 h-screen overflow-y-auto">
+    <div class="p-6 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <span class="text-primary text-xl font-bold">IP</span>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg">Ivo Pita</h1>
+          <p class="text-xs opacity-70">Indústria GLGA</p>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="p-4 space-y-1">
+      <a href="dashboard.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
+        <span>📊</span> Dashboard
+      </a>
+      <a href="admin.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
+        <span>📦</span> Produtos
+      </a>
+      <a href="pedidos.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
+        <span>📋</span> Pedidos
+      </a>
+      <a href="configuracoes.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg text-sm">
+        <span>⚙️</span> Configurações
+      </a>
+    </nav>
+    
+    <div class="absolute bottom-0 p-4 border-t border-white/10 w-64">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100 transition">
+        <span>🏠</span> Voltar ao Site
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto p-6">
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">⚙️ Configurações</h2>
+      <p class="text-sm text-gray-500">Gerencie as configurações do sistema</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Informações do Sistema -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm config-card">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">📱 Informações do Sistema</h3>
+        <div class="space-y-3">
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-500">Versão</span>
+            <span class="font-semibold text-gray-800">1.0.0</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-500">Banco de Dados</span>
+            <span class="font-semibold text-gray-800">Supabase</span>
+          </div>
+          <div class="flex justify-between py-2 border-b border-gray-100">
+            <span class="text-gray-500">Status</span>
+            <span class="status-badge status-active">🟢 Online</span>
+          </div>
+          <div class="flex justify-between py-2">
+            <span class="text-gray-500">Total de Produtos</span>
+            <span class="font-semibold text-gray-800" id="totalProdutos">0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações Rápidas -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm config-card">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">⚡ Ações Rápidas</h3>
+        <div class="space-y-3">
+          <button onclick="exportarDados()" class="w-full btn-primary py-2 text-sm">
+            📥 Exportar Todos os Dados
+          </button>
+          <button onclick="limparCache()" class="w-full btn-secondary py-2 text-sm">
+            🗑️ Limpar Cache do Navegador
+          </button>
+          <button onclick="recarregarProdutos()" class="w-full btn-secondary py-2 text-sm">
+            🔄 Recarregar Produtos
+          </button>
+          <!-- <button onclick="if(confirm('Tem certeza?')){limparBanco()}" class="w-full btn-danger py-2 text-sm">
+            ⚠️ Resetar Sistema (Cuidado!)
+          </button> -->
+        </div>
+      </div>
+
+      <!-- Configurações de Tema -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm config-card">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">🎨 Tema</h3>
+        <div class="space-y-3">
+          <button onclick="alterarTema('light')" class="w-full btn-secondary py-2 text-sm">
+            ☀️ Tema Claro
+          </button>
+          <button onclick="alterarTema('dark')" class="w-full btn-secondary py-2 text-sm">
+            🌙 Tema Escuro
+          </button>
+          <button onclick="alterarTema('system')" class="w-full btn-secondary py-2 text-sm">
+            💻 Tema do Sistema
+          </button>
+        </div>
+      </div>
+
+      <!-- Sobre -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm config-card">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">ℹ️ Sobre</h3>
+        <div class="space-y-3">
+          <p class="text-sm text-gray-600">
+            <strong>Ivo Pita Indústria</strong><br />
+            Sistema de gerenciamento de produtos e pedidos.
+          </p>
+          <p class="text-sm text-gray-500">
+            Desenvolvido para Pedidos - Produtos Químicos
+          </p>
+          <div class="pt-2">
+            <a href="index.html" class="text-sm text-green-600 hover:text-green-800">
+              🏠 Voltar para o site principal
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://pshijarnndbbmpspxinm.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzaGlqYXJubmRiYm1wc3B4aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5Nzc3MjUsImV4cCI6MjEwMDU1MzcyNX0.Bj9H5L0x70hpUOj4tSQu3oXwWpY6yoHgQcDGMAejg8o";
+
+    // Carregar total de produtos
+    async function carregarInfo() {
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const { data } = await supabase.from('produtos').select('*');
+      document.getElementById('totalProdutos').textContent = data?.length || 0;
+    }
+    carregarInfo();
+
+    function exportarDados() {
+      alert('📥 Função de exportação em desenvolvimento');
+    }
+
+    function limparCache() {
+      localStorage.clear();
+      alert('🗑️ Cache limpo com sucesso!');
+      location.reload();
+    }
+
+    function recarregarProdutos() {
+      alert('🔄 Produtos recarregados!');
+      location.reload();
+    }
+
+    function limparBanco() {
+      alert('⚠️ Função de reset protegida - Contate o administrador');
+    }
+
+    function alterarTema(tema) {
+      if (tema === 'dark') {
+        document.body.classList.add('dark');
+        document.body.style.background = '#1a1a2e';
+        alert('🌙 Tema escuro ativado!');
+      } else if (tema === 'light') {
+        document.body.classList.remove('dark');
+        document.body.style.background = '#f3f4f6';
+        alert('☀️ Tema claro ativado!');
+      } else {
+        document.body.classList.remove('dark');
+        document.body.style.background = '';
+        alert('💻 Tema do sistema ativado!');
+      }
+    }
+  </script>
+</body>
+</html>

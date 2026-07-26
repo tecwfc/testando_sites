@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard - Ivo Pita</title>
+  
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <style>
+    .sidebar {
+      background: linear-gradient(180deg, #0b6e3a 0%, #064a26 100%);
+    }
+    .sidebar-link {
+      transition: all 0.2s;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .sidebar-link:hover {
+      background: rgba(255,255,255,0.15);
+      transform: translateX(4px);
+    }
+    .sidebar-link.active {
+      background: rgba(255,255,255,0.2);
+      border-left: 3px solid #4ade80;
+    }
+    .card-hover {
+      transition: all 0.2s;
+    }
+    .card-hover:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+    .status-badge {
+      padding: 2px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+    .status-pendente { background: #fef3c7; color: #92400e; }
+    .status-aprovado { background: #dcfce7; color: #166534; }
+    .status-cancelado { background: #fee2e2; color: #991b1b; }
+    .status-entregue { background: #dbeafe; color: #1e40af; }
+  </style>
+</head>
+<body class="bg-gray-50 flex h-screen overflow-hidden">
+
+  <!-- Sidebar -->
+  <aside class="sidebar w-64 text-white flex-shrink-0 h-screen overflow-y-auto">
+    <div class="p-6 border-b border-white/10">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center">
+          <span class="text-primary text-xl font-bold">IP</span>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg">Ivo Pita</h1>
+          <p class="text-xs opacity-70">Indústria GLGA</p>
+        </div>
+      </div>
+    </div>
+    
+    <nav class="p-4 space-y-1">
+      <a href="dashboard.html" class="sidebar-link active flex items-center gap-3 px-4 py-3 rounded-lg text-sm">
+        <span>📊</span> Dashboard
+      </a>
+      <a href="admin.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
+        <span>📦</span> Produtos
+      </a>
+      <a href="pedidos.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
+        <span>📋</span> Pedidos
+      </a>
+      <a href="configuracoes.html" class="sidebar-link flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100">
+        <span>⚙️</span> Configurações
+      </a>
+    </nav>
+    
+    <div class="absolute bottom-0 p-4 border-t border-white/10 w-64">
+      <a href="index.html" class="flex items-center gap-3 px-4 py-3 rounded-lg text-sm opacity-70 hover:opacity-100 transition">
+        <span>🏠</span> Voltar ao Site
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto p-6">
+    <div class="mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">📊 Dashboard</h2>
+      <p class="text-sm text-gray-500">Visão geral do sistema</p>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div class="bg-white rounded-2xl p-6 shadow-sm card-hover">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Total Produtos</p>
+            <p class="text-2xl font-bold text-gray-800" id="totalProdutos">0</p>
+          </div>
+          <div class="text-3xl">📦</div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm card-hover">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Total Pedidos</p>
+            <p class="text-2xl font-bold text-blue-600" id="totalPedidos">0</p>
+          </div>
+          <div class="text-3xl">📋</div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm card-hover">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Pedidos Pendentes</p>
+            <p class="text-2xl font-bold text-yellow-600" id="pedidosPendentes">0</p>
+          </div>
+          <div class="text-3xl">⏳</div>
+        </div>
+      </div>
+      <div class="bg-white rounded-2xl p-6 shadow-sm card-hover">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm text-gray-500">Valor Total</p>
+            <p class="text-2xl font-bold text-green-600" id="valorTotal">R$ 0,00</p>
+          </div>
+          <div class="text-3xl">💰</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Últimos Pedidos -->
+    <div class="bg-white rounded-2xl shadow-sm p-6">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold text-gray-800">📋 Últimos Pedidos</h3>
+        <a href="pedidos.html" class="text-sm text-green-600 hover:text-green-800">Ver todos →</a>
+      </div>
+      <div id="ultimosPedidos" class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="text-left px-4 py-2 text-xs font-semibold text-gray-500">Pedido</th>
+              <th class="text-left px-4 py-2 text-xs font-semibold text-gray-500">Data</th>
+              <th class="text-left px-4 py-2 text-xs font-semibold text-gray-500">Total</th>
+              <th class="text-left px-4 py-2 text-xs font-semibold text-gray-500">Status</th>
+            </tr>
+          </thead>
+          <tbody id="tabelaPedidos" class="divide-y divide-gray-100">
+            <tr>
+              <td colspan="4" class="text-center py-4 text-gray-400">Carregando pedidos...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = "https://pshijarnndbbmpspxinm.supabase.co";
+    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBzaGlqYXJubmRiYm1wc3B4aW5tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQ5Nzc3MjUsImV4cCI6MjEwMDU1MzcyNX0.Bj9H5L0x70hpUOj4tSQu3oXwWpY6yoHgQcDGMAejg8o";
+
+    async function carregarDashboard() {
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+      try {
+        // Buscar produtos
+        const { data: produtos } = await supabase.from('produtos').select('*');
+        document.getElementById('totalProdutos').textContent = produtos?.length || 0;
+
+        // Buscar pedidos
+        const { data: pedidos } = await supabase
+          .from('pedidos')
+          .select('*')
+          .order('data_pedido', { ascending: false });
+
+        if (pedidos) {
+          document.getElementById('totalPedidos').textContent = pedidos.length;
+          
+          const pendentes = pedidos.filter(p => p.status === 'pendente').length;
+          document.getElementById('pedidosPendentes').textContent = pendentes;
+
+          const total = pedidos.reduce((sum, p) => sum + (parseFloat(p.valor_total) || 0), 0);
+          document.getElementById('valorTotal').textContent = 
+            'R$ ' + total.toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+
+          // Últimos 5 pedidos
+          const ultimos = pedidos.slice(0, 5);
+          const tbody = document.getElementById('tabelaPedidos');
+          
+          if (ultimos.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="text-center py-4 text-gray-400">Nenhum pedido encontrado</td></tr>`;
+          } else {
+            tbody.innerHTML = ultimos.map(p => `
+              <tr>
+                <td class="px-4 py-2 text-sm font-medium text-gray-800">${p.numero_pedido || 'N/A'}</td>
+                <td class="px-4 py-2 text-sm text-gray-500">${new Date(p.data_pedido).toLocaleDateString('pt-BR')}</td>
+                <td class="px-4 py-2 text-sm font-semibold text-green-700">
+                  R$ ${(parseFloat(p.valor_total) || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                </td>
+                <td class="px-4 py-2">
+                  <span class="status-badge status-${p.status || 'pendente'}">
+                    ${p.status || 'Pendente'}
+                  </span>
+                </td>
+              </tr>
+            `).join('');
+          }
+        }
+
+      } catch (err) {
+        console.error('Erro ao carregar dashboard:', err);
+        document.getElementById('tabelaPedidos').innerHTML = 
+          `<tr><td colspan="4" class="text-center py-4 text-red-500">Erro ao carregar dados</td></tr>`;
+      }
+    }
+
+    carregarDashboard();
+  </script>
+</body>
+</html>

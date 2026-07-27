@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clientes - WR Aromatizantes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/admin.css">
+    <link rel="stylesheet" href="../mobile-responsive.css">
+    <style>
+        /* Mesmo estilo base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f3ff; display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: #1a1a2e; color: white; padding: 30px 20px; position: fixed; height: 100vh; overflow-y: auto; transition: all 0.3s; }
+        .sidebar-brand { display: flex; align-items: center; gap: 15px; padding-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
+        .sidebar-brand img { width: 50px; height: 50px; border-radius: 50%; }
+        .sidebar-brand h2 { font-size: 18px; color: #fff; }
+        .sidebar-brand span { color: #8b5cf6; }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 5px; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a0a0b8; text-decoration: none; border-radius: 10px; transition: all 0.3s; font-size: 14px; }
+        .sidebar-menu a:hover { background: rgba(139, 92, 246, 0.2); color: white; }
+        .sidebar-menu a.active { background: #6d28d9; color: white; }
+        .sidebar-menu a i { width: 20px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 20px; left: 20px; right: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer button { width: 100%; padding: 12px; background: rgba(239, 68, 68, 0.2); color: #ef4444; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .sidebar-footer button:hover { background: #ef4444; color: white; }
+        .main-content { margin-left: 280px; flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 28px; color: #1a1a2e; }
+        .header-user { display: flex; align-items: center; gap: 15px; }
+        .header-user .avatar { width: 45px; height: 45px; border-radius: 50%; background: #6d28d9; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+        .mobile-toggle { display: none; background: none; border: none; font-size: 24px; color: #1a1a2e; cursor: pointer; }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .overlay.active { display: block; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .toolbar input { padding: 10px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; flex: 1; max-width: 400px; }
+        .btn-add { padding: 12px 24px; background: #6d28d9; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-add:hover { background: #5b21b6; transform: translateY(-2px); }
+        .table-container { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 15px; background: #f8f7ff; font-size: 12px; text-transform: uppercase; color: #666; font-weight: 700; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; }
+        .btn-sm { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
+        .btn-edit { background: #dbeafe; color: #1e40af; }
+        .btn-edit:hover { background: #bfdbfe; }
+        .btn-delete { background: #fee2e2; color: #991b1b; }
+        .btn-delete:hover { background: #fecaca; }
+        .btn-whatsapp { background: #d1fae5; color: #059669; }
+        .btn-whatsapp:hover { background: #a7f3d0; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; z-index: 1000; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .mobile-toggle { display: block !important; }
+            .toolbar { flex-direction: column; }
+            .toolbar input { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="../assets/Logo.png" alt="WR">
+            <div>
+                <h2>WR <span>Aromatizantes</span></h2>
+                <small style="color:#888;font-size:11px;">Painel Admin</small>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+            <li><a href="categorias.html"><i class="fas fa-tags"></i> Categorias</a></li>
+            <li><a href="pedidos.html"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+            <li><a href="clientes.html" class="active"><i class="fas fa-users"></i> Clientes</a></li>
+            <li><a href="configuracoes.html"><i class="fas fa-cog"></i> Configurações</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </aside>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <div>
+                <button class="mobile-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Clientes</h1>
+            </div>
+            <div class="header-user">
+                <span id="usuarioNome">Admin</span>
+                <div class="avatar" id="avatarUsuario">A</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <input type="text" id="searchInput" placeholder="Buscar cliente por nome ou telefone...">
+            <button class="btn-add" onclick="buscarClientes()">
+                <i class="fas fa-search"></i> Buscar
+            </button>
+            <button class="btn-add" onclick="abrirModalCliente()">
+                <i class="fas fa-plus"></i> Novo Cliente
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Telefone</th>
+                        <th>Email</th>
+                        <th>Endereço</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="clientesTable">
+                    <tr>
+                        <td colspan="5" style="text-align:center;color:#888;">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Cliente -->
+    <div class="modal-overlay" id="modalCliente">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalClienteTitle">Novo Cliente</h2>
+                <button class="modal-close" onclick="fecharModal('modalCliente')">&times;</button>
+            </div>
+            <form id="clienteForm">
+                <input type="hidden" id="clienteId">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="clienteNome" required>
+                </div>
+                <div class="form-group">
+                    <label>Telefone</label>
+                    <input type="text" id="clienteTelefone" placeholder="(88) 99999-9999">
+                </div>
+                <div class="form-group">
+                    <label>WhatsApp</label>
+                    <input type="text" id="clienteWhatsapp" placeholder="(88) 99999-9999">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="clienteEmail">
+                </div>
+                <div class="form-group">
+                    <label>Endereço</label>
+                    <input type="text" id="clienteEndereco">
+                </div>
+                <div class="form-group">
+                    <label>Cidade</label>
+                    <input type="text" id="clienteCidade">
+                </div>
+                <div class="form-group">
+                    <label>CEP</label>
+                    <input type="text" id="clienteCep">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import { getUsuarioLogado, logout, protegerRota } from './auth.js';
+        import { supabase } from '../supabase-config.js';
+
+        if (!protegerRota()) throw new Error('Acesso negado');
+
+        const usuario = getUsuarioLogado();
+        document.getElementById('usuarioNome').textContent = usuario?.nome || 'Admin';
+        document.getElementById('avatarUsuario').textContent = usuario?.nome?.[0]?.toUpperCase() || 'A';
+
+        window.logout = logout;
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        };
+
+        window.abrirModalCliente = function(cliente = null) {
+            const modal = document.getElementById('modalCliente');
+            modal.classList.add('active');
+            
+            if (cliente) {
+                document.getElementById('modalClienteTitle').textContent = 'Editar Cliente';
+                document.getElementById('clienteId').value = cliente.id;
+                document.getElementById('clienteNome').value = cliente.nome;
+                document.getElementById('clienteTelefone').value = cliente.telefone || '';
+                document.getElementById('clienteWhatsapp').value = cliente.whatsapp || '';
+                document.getElementById('clienteEmail').value = cliente.email || '';
+                document.getElementById('clienteEndereco').value = cliente.endereco || '';
+                document.getElementById('clienteCidade').value = cliente.cidade || '';
+                document.getElementById('clienteCep').value = cliente.cep || '';
+            } else {
+                document.getElementById('modalClienteTitle').textContent = 'Novo Cliente';
+                document.getElementById('clienteId').value = '';
+                document.getElementById('clienteForm').reset();
+            }
+        };
+
+        window.fecharModal = function(id) {
+            document.getElementById(id).classList.remove('active');
+        };
+
+        async function carregarClientes() {
+            const tbody = document.getElementById('clientesTable');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Carregando...</td></tr>';
+
+            try {
+                const { data, error } = await supabase
+                    .from('clientes')
+                    .select('*')
+                    .order('nome');
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align:center;padding:40px;color:#888;">
+                                <i class="fas fa-users" style="font-size:48px;display:block;margin-bottom:15px;opacity:0.3;"></i>
+                                Nenhum cliente cadastrado
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(c => `
+                    <tr>
+                        <td><strong>${c.nome}</strong></td>
+                        <td>${c.telefone || '-'}</td>
+                        <td>${c.email || '-'}</td>
+                        <td>${c.endereco || '-'}</td>
+                        <td>
+                            ${c.whatsapp ? `
+                                <a href="https://wa.me/${c.whatsapp.replace(/\D/g, '')}" target="_blank" 
+                                   class="btn-sm btn-whatsapp" title="WhatsApp">
+                                    <i class="fab fa-whatsapp"></i>
+                                </a>
+                            ` : ''}
+                            <button class="btn-sm btn-edit" onclick="editarCliente('${c.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-sm btn-delete" onclick="excluirCliente('${c.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Erro ao carregar clientes:', error);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Erro: ${error.message}</td></tr>`;
+            }
+        }
+
+        window.editarCliente = async function(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('clientes')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+                abrirModalCliente(data);
+            } catch (error) {
+                console.error('Erro ao buscar cliente:', error);
+                alert('Erro ao carregar dados do cliente');
+            }
+        };
+
+        window.excluirCliente = async function(id) {
+            if (!confirm('Tem certeza que deseja excluir este cliente?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('clientes')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+                carregarClientes();
+                showToast('Cliente excluído!', 'success');
+            } catch (error) {
+                console.error('Erro ao excluir cliente:', error);
+                showToast('Erro ao excluir cliente', 'error');
+            }
+        };
+
+        window.buscarClientes = async function() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            const tbody = document.getElementById('clientesTable');
+
+            if (!termo) {
+                carregarClientes();
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('clientes')
+                    .select('*')
+                    .or(`nome.ilike.%${termo}%,telefone.ilike.%${termo}%`)
+                    .order('nome');
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Nenhum cliente encontrado</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.map(c => `
+                    <tr>
+                        <td><strong>${c.nome}</strong></td>
+                        <td>${c.telefone || '-'}</td>
+                        <td>${c.email || '-'}</td>
+                        <td>${c.endereco || '-'}</td>
+                        <td>
+                            ${c.whatsapp ? `<a href="https://wa.me/${c.whatsapp.replace(/\D/g, '')}" target="_blank" class="btn-sm btn-whatsapp"><i class="fab fa-whatsapp"></i></a>` : ''}
+                            <button class="btn-sm btn-edit" onclick="editarCliente('${c.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-sm btn-delete" onclick="excluirCliente('${c.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Erro na busca:', error);
+            }
+        };
+
+        document.getElementById('clienteForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('clienteId').value;
+            const cliente = {
+                nome: document.getElementById('clienteNome').value,
+                telefone: document.getElementById('clienteTelefone').value,
+                whatsapp: document.getElementById('clienteWhatsapp').value,
+                email: document.getElementById('clienteEmail').value,
+                endereco: document.getElementById('clienteEndereco').value,
+                cidade: document.getElementById('clienteCidade').value,
+                cep: document.getElementById('clienteCep').value,
+            };
+
+            try {
+                let result;
+                if (id) {
+                    result = await supabase
+                        .from('clientes')
+                        .update(cliente)
+                        .eq('id', id);
+                } else {
+                    result = await supabase
+                        .from('clientes')
+                        .insert([cliente]);
+                }
+
+                if (result.error) throw result.error;
+
+                fecharModal('modalCliente');
+                carregarClientes();
+                showToast(id ? 'Cliente atualizado!' : 'Cliente criado!', 'success');
+            } catch (error) {
+                console.error('Erro ao salvar:', error);
+                showToast('Erro ao salvar cliente', 'error');
+            }
+        });
+
+        function showToast(message, type = 'info') {
+            const colors = { success: '#059669', error: '#dc2626', info: '#2563eb' };
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${colors[type] || '#6d28d9'};
+                color: white;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 99999;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                max-width: 400px;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        document.getElementById('searchInput').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') buscarClientes();
+        });
+
+        carregarClientes();
+    </script>
+</body>
+</html>

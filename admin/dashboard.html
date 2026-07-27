@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - WR Aromatizantes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/admin.css">
+    <link rel="stylesheet" href="../mobile-responsive.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f3ff;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: #1a1a2e;
+            color: white;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s;
+        }
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        .sidebar-brand img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .sidebar-brand h2 {
+            font-size: 18px;
+            color: #fff;
+        }
+        .sidebar-brand span {
+            color: #8b5cf6;
+        }
+        .sidebar-menu {
+            list-style: none;
+        }
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #a0a0b8;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(139, 92, 246, 0.2);
+            color: white;
+        }
+        .sidebar-menu a.active {
+            background: #6d28d9;
+            color: white;
+        }
+        .sidebar-menu a i {
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-footer button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .sidebar-footer button:hover {
+            background: #ef4444;
+            color: white;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 28px;
+            color: #1a1a2e;
+        }
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header-user .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #6d28d9;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        /* Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .stat-card .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+        .stat-card .icon.purple { background: #ede9fe; color: #6d28d9; }
+        .stat-card .icon.green { background: #d1fae5; color: #059669; }
+        .stat-card .icon.blue { background: #dbeafe; color: #2563eb; }
+        .stat-card .icon.orange { background: #fef3c7; color: #d97706; }
+        .stat-card .icon.red { background: #fee2e2; color: #dc2626; }
+        .stat-card .icon.pink { background: #fce7f3; color: #db2777; }
+        .stat-card .value {
+            font-size: 32px;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+        .stat-card .label {
+            color: #888;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        /* Gráficos */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        .chart-box {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .chart-box h3 {
+            margin-bottom: 20px;
+            color: #1a1a2e;
+        }
+        .chart-box canvas {
+            max-height: 300px;
+        }
+
+        /* Tabela de pedidos recentes */
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .table-container h3 {
+            margin-bottom: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 12px 15px;
+            background: #f8f7ff;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #666;
+            font-weight: 700;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.aguardando { background: #fef3c7; color: #92400e; }
+        .status-badge.preparo { background: #dbeafe; color: #1e40af; }
+        .status-badge.entrega { background: #e0e7ff; color: #3730a3; }
+        .status-badge.entregue { background: #d1fae5; color: #065f46; }
+        .status-badge.cancelado { background: #fee2e2; color: #991b1b; }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                z-index: 1000;
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+                padding: 20px;
+            }
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .mobile-toggle {
+                display: block !important;
+            }
+        }
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #1a1a2e;
+            cursor: pointer;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .overlay.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="../assets/Logo.png" alt="WR">
+            <div>
+                <h2>WR <span>Aromatizantes</span></h2>
+                <small style="color:#888;font-size:11px;">Painel Admin</small>
+            </div>
+        </div>
+
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html" class="active"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+            <li><a href="categorias.html"><i class="fas fa-tags"></i> Categorias</a></li>
+            <li><a href="pedidos.html"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+            <li><a href="clientes.html"><i class="fas fa-users"></i> Clientes</a></li>
+            <li><a href="configuracoes.html"><i class="fas fa-cog"></i> Configurações</a></li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </aside>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <div>
+                <button class="mobile-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Dashboard</h1>
+            </div>
+            <div class="header-user">
+                <span id="usuarioNome">Admin</span>
+                <div class="avatar" id="avatarUsuario">A</div>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="icon purple"><i class="fas fa-dollar-sign"></i></div>
+                <div class="value" id="totalVendas">R$ 0,00</div>
+                <div class="label">Total em Vendas</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon green"><i class="fas fa-shopping-bag"></i></div>
+                <div class="value" id="pedidosHoje">0</div>
+                <div class="label">Pedidos Hoje</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon blue"><i class="fas fa-calendar-alt"></i></div>
+                <div class="value" id="vendasMes">R$ 0,00</div>
+                <div class="label">Vendas do Mês</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon orange"><i class="fas fa-box"></i></div>
+                <div class="value" id="totalProdutos">0</div>
+                <div class="label">Produtos Cadastrados</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon red"><i class="fas fa-exclamation-triangle"></i></div>
+                <div class="value" id="estoqueBaixo">0</div>
+                <div class="label">Estoque Baixo</div>
+            </div>
+            <div class="stat-card">
+                <div class="icon pink"><i class="fas fa-users"></i></div>
+                <div class="value" id="totalClientes">0</div>
+                <div class="label">Clientes Cadastrados</div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <div class="chart-box">
+                <h3>Vendas dos Últimos 7 Dias</h3>
+                <canvas id="vendasChart"></canvas>
+            </div>
+            <div class="chart-box">
+                <h3>Status dos Pedidos</h3>
+                <canvas id="statusChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Pedidos Recentes -->
+        <div class="table-container">
+            <h3>Últimos Pedidos</h3>
+            <div style="overflow-x:auto;">
+                <table>
+                    <thead>
+                        <tr>
+                            <th># Pedido</th>
+                            <th>Cliente</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ultimosPedidos">
+                        <tr>
+                            <td colspan="5" style="text-align:center;color:#888;">Carregando...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script type="importmap">
+{
+  "imports": {
+    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+  }
+}
+</script>
+
+<script type="module">
+  import { 
+    supabase, 
+    subscribeToTable,
+    unsubscribeFromTable 
+  } from '../supabase-config.js';
+  import { getUsuarioLogado, logout, protegerRota } from './auth.js';
+  import { getEstatisticasDashboard, listarPedidos } from './admin-services.js';
+
+
+  let channels = [];
+
+  // 🆕 Iniciar escuta em tempo real no dashboard
+  function iniciarRealtimeDashboard() {
+    // Escutar mudanças em pedidos
+    const channelPedidos = subscribeToTable('pedidos', (payload) => {
+      console.log('🔄 Pedido atualizado:', payload);
+      carregarDashboard();
+    });
+    channels.push(channelPedidos);
+
+    // Escutar mudanças em produtos (afeta estatísticas)
+    const channelProdutos = subscribeToTable('produtos', (payload) => {
+      console.log('🔄 Produto atualizado:', payload);
+      carregarDashboard();
+    });
+    channels.push(channelProdutos);
+
+    // Escutar mudanças em clientes
+    const channelClientes = subscribeToTable('clientes', (payload) => {
+      console.log('🔄 Cliente atualizado:', payload);
+      carregarDashboard();
+    });
+    channels.push(channelClientes);
+  }
+
+  // Limpar inscrições ao sair
+  window.addEventListener('beforeunload', () => {
+    channels.forEach(ch => unsubscribeFromTable(ch));
+  });
+
+  // Iniciar após carregar
+  setTimeout(() => {
+    iniciarRealtimeDashboard();
+  }, 1000);
+
+        // Proteger rota
+        protegerRota();
+
+        // Usuário
+        const usuario = getUsuarioLogado();
+        document.getElementById('usuarioNome').textContent = usuario.nome;
+        document.getElementById('avatarUsuario').textContent = usuario.nome[0].toUpperCase();
+
+        // Logout
+        window.logout = logout;
+
+        // Toggle sidebar mobile
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        };
+
+        // Carregar dados
+        async function carregarDashboard() {
+            try {
+                // Estatísticas
+                const stats = await getEstatisticasDashboard();
+                
+                document.getElementById('totalVendas').textContent = 
+                    `R$ ${stats.totalVendas.toFixed(2).replace('.', ',')}`;
+                document.getElementById('pedidosHoje').textContent = stats.pedidosHoje;
+                document.getElementById('vendasMes').textContent = 
+                    `R$ ${stats.totalMes.toFixed(2).replace('.', ',')}`;
+
+                // Total de produtos
+                const { count: totalProd } = await supabase
+                    .from('produtos')
+                    .select('*', { count: 'exact', head: true });
+                document.getElementById('totalProdutos').textContent = totalProd;
+
+                // Estoque baixo
+                const { count: baixo } = await supabase
+                    .from('produtos')
+                    .select('*', { count: 'exact', head: true })
+                    .lte('saldo', supabase.raw('estoque_minimo'));
+                document.getElementById('estoqueBaixo').textContent = baixo;
+
+                // Total clientes
+                const { count: clientes } = await supabase
+                    .from('clientes')
+                    .select('*', { count: 'exact', head: true });
+                document.getElementById('totalClientes').textContent = clientes;
+
+                // Gráfico de vendas (últimos 7 dias)
+                const dias = [];
+                const valores = [];
+                for (let i = 6; i >= 0; i--) {
+                    const data = new Date();
+                    data.setDate(data.getDate() - i);
+                    const dataStr = data.toISOString().split('T')[0];
+                    dias.push(dataStr.slice(5));
+
+                    const { data: vendasDia } = await supabase
+                        .from('pedidos')
+                        .select('valor_total')
+                        .gte('criado_em', dataStr)
+                        .lt('criado_em', dataStr + 'T23:59:59')
+                        .eq('status', 'Entregue');
+
+                    const total = vendasDia ? vendasDia.reduce((acc, item) => acc + (item.valor_total || 0), 0) : 0;
+                    valores.push(total);
+                }
+
+                new Chart(document.getElementById('vendasChart'), {
+                    type: 'line',
+                    data: {
+                        labels: dias,
+                        datasets: [{
+                            label: 'Vendas (R$)',
+                            data: valores,
+                            borderColor: '#6d28d9',
+                            backgroundColor: 'rgba(109, 40, 217, 0.1)',
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { display: false } }
+                    }
+                });
+
+                // Gráfico de status
+                const statusData = stats.statusCount || [];
+                const statusLabels = statusData.map(s => s.status);
+                const statusValues = statusData.map(s => parseInt(s.count));
+
+                new Chart(document.getElementById('statusChart'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: statusLabels,
+                        datasets: [{
+                            data: statusValues,
+                            backgroundColor: ['#f59e0b', '#3b82f6', '#6366f1', '#10b981', '#ef4444']
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: { legend: { position: 'bottom' } }
+                    }
+                });
+
+                // Últimos pedidos
+                const pedidos = await listarPedidos({ limite: 5 });
+                const tbody = document.getElementById('ultimosPedidos');
+                
+                if (pedidos.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Nenhum pedido encontrado</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = pedidos.slice(0, 5).map(p => `
+                    <tr>
+                        <td><strong>#${p.numero_pedido}</strong></td>
+                        <td>${p.cliente_nome || 'Cliente não identificado'}</td>
+                        <td>R$ ${(p.valor_total || 0).toFixed(2).replace('.', ',')}</td>
+                        <td><span class="status-badge ${p.status.toLowerCase()}">${p.status}</span></td>
+                        <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Erro ao carregar dashboard:', error);
+            }
+        }
+
+        carregarDashboard();
+    </script>
+
+
+
+</body>
+</html>

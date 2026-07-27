@@ -1,0 +1,749 @@
+/* ============================================================
+   MOBILE RESPONSIVE - WR AROMATIZANTES
+   Baseado no estilo do Supervila para mobile
+   ============================================================ */
+
+/* ─── TAMANHOS GERAIS ──────────────────────────────────────── */
+:root {
+  --mobile-header-height: 56px;
+  --mobile-nav-height: 56px;
+  --mobile-radius: 12px;
+  --mobile-padding: 12px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ─── LAYOUT BASE ──────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Reset de tamanhos */
+  html, body {
+    font-size: 14px;
+  }
+
+  /* Container principal mais compacto */
+  .max-w-7xl {
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  /* ─── HEADER / NAVEGAÇÃO ──────────────────────────────────── */
+  .glass-nav {
+    padding: 8px 12px !important;
+    min-height: var(--mobile-header-height);
+  }
+
+  .glass-nav .w-12.h-12 {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  .glass-nav h1.text-xl {
+    font-size: 15px !important;
+  }
+
+  .glass-nav .text-sm.block {
+    font-size: 8px !important;
+  }
+
+  /* Botão do carrinho */
+  #cart-btn {
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+  }
+
+  #cart-btn .fa-cart-shopping {
+    font-size: 14px !important;
+  }
+
+  #cart-count {
+    width: 18px !important;
+    height: 18px !important;
+    font-size: 8px !important;
+    top: -4px !important;
+    right: -4px !important;
+  }
+
+  /* Botão menu mobile */
+  .lg\\:hidden.flex.items-center {
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px !important;
+  }
+
+  .lg\\:hidden.flex.items-center i {
+    font-size: 16px !important;
+  }
+
+  /* ─── MARQUEE / BANNER TOPO ──────────────────────────────── */
+  .mt-\\[80px\\] {
+    margin-top: calc(var(--mobile-header-height) + 4px) !important;
+  }
+
+  .animate-marquee span {
+    font-size: 8px !important;
+    gap: 6px !important;
+  }
+
+  .animate-marquee i {
+    font-size: 10px !important;
+  }
+
+  /* ─── BANNER PRINCIPAL ────────────────────────────────────── */
+  .bg-wr-gradient {
+    border-radius: 16px !important;
+    padding: 20px 16px !important;
+  }
+
+  .bg-wr-gradient h2.text-3xl {
+    font-size: 22px !important;
+  }
+
+  .bg-wr-gradient p.text-sm {
+    font-size: 12px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .bg-wr-gradient a {
+    padding: 10px 16px !important;
+    font-size: 9px !important;
+    min-width: auto !important;
+    border-radius: 10px !important;
+  }
+
+  .bg-wr-gradient .inline-flex.items-center {
+    padding: 4px 10px !important;
+    margin-bottom: 10px !important;
+  }
+
+  .bg-wr-gradient .text-\\[9px\\] {
+    font-size: 7px !important;
+  }
+
+  .bg-wr-gradient .w-2.h-2 {
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  /* ─── CATEGORIAS ──────────────────────────────────────────── */
+  .category-ring .w-16.h-16 {
+    width: 48px !important;
+    height: 48px !important;
+  }
+
+  .category-ring .w-16.h-16 img,
+  .category-ring .w-16.h-16 i {
+    width: 22px !important;
+    height: 22px !important;
+    font-size: 14px !important;
+  }
+
+  .category-card {
+    min-width: 64px !important;
+    gap: 4px !important;
+  }
+
+  .category-card span {
+    font-size: 7px !important;
+  }
+
+  .flex.overflow-x-auto {
+    gap: 10px !important;
+    padding-bottom: 8px !important;
+  }
+
+  /* ─── DESTAQUES ───────────────────────────────────────────── */
+  .destaque-card-premium {
+    border-radius: 16px !important;
+    padding: 14px !important;
+  }
+
+  .destaque-card-premium .absolute.top-6.left-6 {
+    top: 10px !important;
+    left: 10px !important;
+  }
+
+  .destaque-card-premium .bg-primary.text-white {
+    font-size: 8px !important;
+    padding: 2px 8px !important;
+  }
+
+  .destaque-card-premium .w-full.aspect-square {
+    margin-bottom: 12px !important;
+    border-radius: 12px !important;
+  }
+
+  .destaque-card-premium .text-2xl {
+    font-size: 16px !important;
+  }
+
+  .destaque-card-premium h3.text-base {
+    font-size: 13px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .destaque-card-premium .w-full.bg-dark {
+    padding: 10px !important;
+    font-size: 9px !important;
+    border-radius: 10px !important;
+  }
+
+  .destaque-card-premium .text-\\[9px\\] {
+    font-size: 7px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .swiper-slide {
+    padding: 6px 0 !important;
+  }
+
+  .destaquesSwiper {
+    padding-bottom: 30px !important;
+  }
+
+  /* ─── PRODUTOS ────────────────────────────────────────────── */
+  #produtos-container {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 8px !important;
+  }
+
+  .product-card {
+    border-radius: 14px !important;
+    padding: 8px !important;
+  }
+
+  .product-card .relative.aspect-square {
+    border-radius: 10px !important;
+    margin-bottom: 8px !important;
+  }
+
+  .product-card .text-\\[9px\\].uppercase {
+    font-size: 7px !important;
+    margin-bottom: 2px !important;
+  }
+
+  .product-card h3.text-sm {
+    font-size: 11px !important;
+  }
+
+  .product-card .text-\\[11px\\].font-black {
+    font-size: 9px !important;
+    padding: 2px 6px !important;
+  }
+
+  .product-card .text-\\[11px\\].font-black i {
+    font-size: 7px !important;
+  }
+
+  .product-card .text-base.font-black {
+    font-size: 13px !important;
+  }
+
+  .product-card .w-12.h-12 {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+    bottom: 8px !important;
+    right: 8px !important;
+  }
+
+  .product-card .w-12.h-12 i {
+    font-size: 11px !important;
+  }
+
+  .product-card .h-8.w-8 {
+    width: 24px !important;
+    height: 24px !important;
+  }
+
+  .product-card .h-8.w-8 i {
+    font-size: 8px !important;
+  }
+
+  .product-card .text-\\[8px\\] {
+    font-size: 7px !important;
+  }
+
+  .product-card .border-t {
+    padding-top: 6px !important;
+  }
+
+  .product-card .absolute.top-3.right-3 {
+    top: 6px !important;
+    right: 6px !important;
+  }
+
+  .product-card .absolute.top-3.right-3 span {
+    font-size: 7px !important;
+    padding: 2px 6px !important;
+    min-width: 50px !important;
+  }
+
+  .product-card .absolute.top-4.right-4 {
+    top: 6px !important;
+    right: 6px !important;
+  }
+
+  .product-card .absolute.top-4.right-4 span {
+    font-size: 7px !important;
+    padding: 2px 6px !important;
+  }
+
+  .product-card .bg-black\\/40 span {
+    font-size: 8px !important;
+    padding: 4px 10px !important;
+  }
+
+  /* ─── SEÇÃO TÍTULOS ───────────────────────────────────────── */
+  #destaques .text-center.mb-10 {
+    margin-bottom: 8px !important;
+  }
+
+  #destaques .text-\\[10px\\] {
+    font-size: 8px !important;
+  }
+
+  #destaques h2.text-3xl {
+    font-size: 20px !important;
+  }
+
+  #destaques .w-12.h-1 {
+    width: 30px !important;
+    margin-top: 6px !important;
+  }
+
+  #produtos h2.text-3xl {
+    font-size: 20px !important;
+    margin-bottom: 12px !important;
+  }
+
+  /* ─── CARRINHO MODAL ──────────────────────────────────────── */
+  #cart-modal > div {
+    width: 94% !important;
+    max-height: 88vh !important;
+    border-radius: 20px !important;
+  }
+
+  #cart-modal .p-4.pb-0 {
+    padding: 12px 14px 0 !important;
+  }
+
+  #cart-modal h2.text-xl {
+    font-size: 16px !important;
+  }
+
+  #cart-modal .text-\\[8px\\] {
+    font-size: 7px !important;
+  }
+
+  #cart-modal .bg-slate-50.p-3 {
+    padding: 8px 10px !important;
+    border-radius: 10px !important;
+  }
+
+  #cart-modal .h-1\\.5 {
+    height: 4px !important;
+  }
+
+  #cart-items {
+    padding: 8px 10px !important;
+    gap: 8px !important;
+    min-height: 100px !important;
+  }
+
+  #cart-items .flex.flex-col.mb-3 {
+    padding: 8px 10px !important;
+    margin-bottom: 6px !important;
+    border-radius: 10px !important;
+  }
+
+  #cart-items .w-12.h-12 {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 6px !important;
+  }
+
+  #cart-items .font-black.text-\\[12px\\] {
+    font-size: 10px !important;
+  }
+
+  #cart-items .bg-slate-50.p-1 {
+    padding: 2px 4px !important;
+    border-radius: 6px !important;
+  }
+
+  #cart-items .w-6.h-6 {
+    width: 20px !important;
+    height: 20px !important;
+  }
+
+  #cart-items .w-6.h-6 i {
+    font-size: 7px !important;
+  }
+
+  #cart-items .text-xs.w-3 {
+    font-size: 10px !important;
+    width: 16px !important;
+  }
+
+  #cart-items .p-1 i {
+    font-size: 10px !important;
+  }
+
+  #cart-total {
+    font-size: 18px !important;
+  }
+
+  #address {
+    padding: 8px 12px !important;
+    font-size: 12px !important;
+    height: 40px !important;
+    border-radius: 10px !important;
+  }
+
+  #checkout-btn {
+    padding: 10px !important;
+    font-size: 9px !important;
+    border-radius: 10px !important;
+  }
+
+  #checkout-btn i {
+    font-size: 14px !important;
+  }
+
+  #entrega-valor-desc {
+    font-size: 12px !important;
+  }
+
+  .bg-primary\\/5.p-3 {
+    padding: 8px 10px !important;
+    border-radius: 8px !important;
+  }
+
+  .bg-primary\\/5.p-3 .text-\\[9px\\] {
+    font-size: 8px !important;
+  }
+
+  /* ─── MENU MOBILE ─────────────────────────────────────────── */
+  #mobile-menu {
+    width: 82% !important;
+    max-width: 280px !important;
+  }
+
+  #mobile-menu .p-6 {
+    padding: 14px 16px !important;
+  }
+
+  #mobile-menu .border-b {
+    padding: 12px 16px !important;
+  }
+
+  #mobile-menu .text-xl {
+    font-size: 16px !important;
+  }
+
+  #mobile-menu .h-10.w-10 {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  #mobile-menu .h-10.w-10 i {
+    font-size: 16px !important;
+  }
+
+  #mobile-menu button.w-full {
+    padding: 10px 14px !important;
+    font-size: 12px !important;
+    border-radius: 8px !important;
+  }
+
+  #mobile-menu button.w-full i {
+    font-size: 14px !important;
+  }
+
+  /* ─── QUIZ MODAL ──────────────────────────────────────────── */
+  #quiz-modal .bg-white {
+    border-radius: 20px !important;
+    max-width: 94% !important;
+  }
+
+  #quiz-modal .p-8 {
+    padding: 20px 16px !important;
+  }
+
+  #quiz-modal .text-2xl {
+    font-size: 18px !important;
+    margin-bottom: 16px !important;
+  }
+
+  #quiz-modal .grid.gap-4 {
+    gap: 10px !important;
+  }
+
+  #quiz-modal button.p-5 {
+    padding: 12px 14px !important;
+    border-radius: 10px !important;
+    gap: 10px !important;
+  }
+
+  #quiz-modal .w-12.h-12 {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px !important;
+  }
+
+  #quiz-modal .w-12.h-12 i {
+    font-size: 14px !important;
+  }
+
+  #quiz-modal button.w-full {
+    padding: 12px !important;
+    font-size: 13px !important;
+    border-radius: 10px !important;
+  }
+
+  #quiz-modal .absolute.top-6.right-6 {
+    top: 12px !important;
+    right: 12px !important;
+  }
+
+  #quiz-modal .absolute.top-6.right-6 i {
+    font-size: 18px !important;
+  }
+
+  #quiz-progress {
+    height: 3px !important;
+  }
+
+  /* ─── WHATSAPP FLOATING ───────────────────────────────────── */
+  .fixed.bottom-6.right-6.w-14.h-14 {
+    width: 44px !important;
+    height: 44px !important;
+    font-size: 20px !important;
+    bottom: 14px !important;
+    right: 14px !important;
+  }
+
+  /* ─── QUIZ BOTÃO ──────────────────────────────────────────── */
+  .fixed.bottom-24.right-6 {
+    bottom: 66px !important;
+    right: 14px !important;
+    padding: 8px 12px !important;
+    font-size: 8px !important;
+    border-radius: 10px !important;
+  }
+
+  .fixed.bottom-24.right-6 i {
+    font-size: 12px !important;
+  }
+
+  /* ─── FOOTER ──────────────────────────────────────────────── */
+  footer.bg-slate-900 {
+    padding: 24px 16px 16px !important;
+    margin-top: 20px !important;
+  }
+
+  footer h2.text-2xl {
+    font-size: 18px !important;
+    margin-bottom: 8px !important;
+  }
+
+  footer p.text-sm {
+    font-size: 12px !important;
+  }
+
+  footer .mt-10 {
+    margin-top: 16px !important;
+    padding-top: 12px !important;
+  }
+
+  footer .text-\\[10px\\] {
+    font-size: 8px !important;
+  }
+
+  /* ─── INSTALL BANNER ──────────────────────────────────────── */
+  #install-banner {
+    padding: 10px 14px !important;
+    border-radius: 14px !important;
+    bottom: 14px !important;
+    left: 14px !important;
+    right: 14px !important;
+    gap: 10px !important;
+  }
+
+  #install-banner .w-12.h-12 {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 10px !important;
+  }
+
+  #install-banner h4.text-\\[13px\\] {
+    font-size: 11px !important;
+  }
+
+  #install-banner p.text-\\[10px\\] {
+    font-size: 8px !important;
+  }
+
+  #install-banner button {
+    font-size: 8px !important;
+    padding: 4px 10px !important;
+    border-radius: 8px !important;
+  }
+
+  #install-banner .flex.flex-col.gap-2 {
+    gap: 4px !important;
+  }
+
+  #install-banner .text-\\[10px\\] {
+    font-size: 8px !important;
+  }
+}
+
+/* ─── TABLET ────────────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  #produtos-container {
+    grid-template-columns: repeat(3, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  .bg-wr-gradient {
+    padding: 28px 24px !important;
+  }
+
+  .bg-wr-gradient h2.text-3xl {
+    font-size: 28px !important;
+  }
+
+  .product-card {
+    padding: 10px !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+/* ─── DESKTOP PEQUENO ──────────────────────────────────────── */
+@media (min-width: 1025px) and (max-width: 1280px) {
+  #produtos-container {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+
+/* ─── DESKTOP GRANDE ───────────────────────────────────────── */
+@media (min-width: 1281px) {
+  #produtos-container {
+    grid-template-columns: repeat(4, 1fr) !important;
+  }
+}
+/* ============================================================
+   MENU MOBILE INFERIOR
+   ============================================================ */
+@media (max-width: 768px) {
+    .mobile-bottom-nav {
+        display: flex !important;
+        height: 60px;
+        background: white;
+        border-top: 1px solid #e2e8f0;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        z-index: 9999;
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+    }
+
+    .mobile-bottom-nav button,
+    .mobile-bottom-nav a {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 2px;
+        background: none;
+        border: none;
+        color: #94a3b8;
+        font-family: inherit;
+        cursor: pointer;
+        padding: 4px 0;
+        transition: color 0.2s;
+        text-decoration: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .mobile-bottom-nav button:active,
+    .mobile-bottom-nav a:active {
+        transform: scale(0.92);
+        color: #6d28d9;
+    }
+
+    .mobile-bottom-nav button i,
+    .mobile-bottom-nav a i {
+        font-size: 20px;
+        transition: transform 0.2s;
+    }
+
+    .mobile-bottom-nav button:active i,
+    .mobile-bottom-nav a:active i {
+        transform: scale(1.1);
+    }
+
+    .mobile-bottom-nav button span,
+    .mobile-bottom-nav a span {
+        font-size: 8px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+    }
+
+    .mobile-bottom-nav .active {
+        color: #6d28d9;
+    }
+
+    /* Badge do carrinho no menu */
+    #mobile-cart-count {
+        position: absolute;
+        top: -6px;
+        right: -8px;
+        background: #ef4444;
+        color: white;
+        font-size: 8px;
+        font-weight: 900;
+        min-width: 18px;
+        height: 18px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border: 2px solid white;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        padding: 0 4px;
+    }
+
+    /* Espaço para o menu */
+    .content-scroll,
+    #produtos-container,
+    section:last-of-type {
+        padding-bottom: 76px !important;
+    }
+
+    /* Ocultar botão WhatsApp flutuante (já está no menu) */
+    .fixed.bottom-6.right-6.w-14.h-14 {
+        display: none !important;
+    }
+
+    /* Ajustar botão do quiz */
+    .fixed.bottom-24.right-6 {
+        bottom: 76px !important;
+        right: 12px !important;
+        padding: 8px 12px !important;
+        font-size: 8px !important;
+        border-radius: 10px !important;
+        z-index: 9998 !important;
+    }
+
+    .fixed.bottom-24.right-6 i {
+        font-size: 12px !important;
+    }
+}

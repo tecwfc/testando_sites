@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin WR Aromatizantes - Login</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/admin.css">
+    <link rel="stylesheet" href="../mobile-responsive.css">
+    <style>
+        /* ============================================================
+           ESTILOS DA PÁGINA DE LOGIN
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #6d28d9 0%, #2e1065 100%);
+            padding: 20px;
+        }
+
+        .login-container {
+            background: white;
+            border-radius: 30px;
+            padding: 50px 40px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        .login-logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .login-logo img {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            margin-bottom: 15px;
+        }
+
+        .login-logo h1 {
+            font-size: 24px;
+            color: #1a1a2e;
+        }
+
+        .login-logo p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6d28d9;
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+        }
+
+        .btn-login {
+            width: 100%;
+            padding: 16px;
+            background: #6d28d9;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-login:hover {
+            background: #5b21b6;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(109, 40, 217, 0.3);
+        }
+
+        .btn-login:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            display: block;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #059669;
+            border: 1px solid #a7f3d0;
+            display: block;
+        }
+
+        .login-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #888;
+            font-size: 13px;
+        }
+
+        .login-footer a {
+            color: #6d28d9;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .senha-toggle {
+            position: relative;
+        }
+
+        .senha-toggle input {
+            padding-right: 50px;
+        }
+
+        .senha-toggle button {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #888;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .senha-toggle button:hover {
+            color: #333;
+        }
+
+        /* ============================================================
+           RESPONSIVE - WR AROMATIZANTES (MOBILE)
+           ============================================================ */
+
+        /* Mobile First - Ajustes para telas pequenas */
+        @media (max-width: 640px) {
+            /* Header mais compacto */
+            header.glass-nav {
+                padding: 10px 14px !important;
+            }
+            
+            header .relative.w-12.h-12 {
+                width: 40px !important;
+                height: 40px !important;
+            }
+            
+            header h1 {
+                font-size: 16px !important;
+            }
+            
+            header h1 span.text-primary {
+                font-size: 9px !important;
+            }
+            
+            /* Botão do carrinho menor */
+            #cart-btn {
+                padding: 10px !important;
+                border-radius: 12px !important;
+            }
+            
+            #cart-btn .fa-cart-shopping {
+                font-size: 14px !important;
+            }
+            
+            #cart-count {
+                width: 20px !important;
+                height: 20px !important;
+                font-size: 9px !important;
+                top: -4px !important;
+                right: -4px !important;
+            }
+            
+            /* Banner principal */
+            .bg-wr-gradient {
+                border-radius: 20px !important;
+                padding: 24px 16px !important;
+            }
+            
+            .bg-wr-gradient h2 {
+                font-size: 24px !important;
+            }
+            
+            .bg-wr-gradient p {
+                font-size: 13px !important;
+                margin-bottom: 16px !important;
+            }
+            
+            .bg-wr-gradient a {
+                padding: 12px 20px !important;
+                font-size: 10px !important;
+                min-width: auto !important;
+            }
+            
+            /* Categorias - mais compactas */
+            .category-ring .w-16.h-16 {
+                width: 56px !important;
+                height: 56px !important;
+            }
+            
+            .category-ring .w-16.h-16 img,
+            .category-ring .w-16.h-16 i {
+                width: 28px !important;
+                height: 28px !important;
+                font-size: 16px !important;
+            }
+            
+            .category-card span {
+                font-size: 8px !important;
+            }
+            
+            /* Produtos - grade 2 colunas */
+            #produtos-container {
+                grid-template-columns: repeat(2, 1fr) !important;
+                gap: 10px !important;
+            }
+            
+            .product-card {
+                border-radius: 16px !important;
+                padding: 10px !important;
+            }
+            
+            .product-card .relative.aspect-square {
+                border-radius: 12px !important;
+                margin-bottom: 10px !important;
+            }
+            
+            .product-card h3 {
+                font-size: 12px !important;
+            }
+            
+            .product-card .text-primary.bg-primary\/10 {
+                font-size: 10px !important;
+                padding: 2px 8px !important;
+            }
+            
+            .product-card .text-base.font-black {
+                font-size: 14px !important;
+            }
+            
+            .product-card button.w-12.h-12 {
+                width: 36px !important;
+                height: 36px !important;
+                border-radius: 10px !important;
+                bottom: 10px !important;
+                right: 10px !important;
+            }
+            
+            .product-card button.w-12.h-12 i {
+                font-size: 12px !important;
+            }
+            
+            /* Destaques */
+            .destaque-card-premium {
+                border-radius: 20px !important;
+                padding: 16px !important;
+            }
+            
+            .destaque-card-premium .text-2xl {
+                font-size: 18px !important;
+            }
+            
+            .destaque-card-premium .w-full.bg-dark {
+                padding: 12px !important;
+                font-size: 10px !important;
+            }
+            
+            /* Modal do carrinho */
+            #cart-modal .modal-box {
+                border-radius: 20px !important;
+            }
+            
+            #cart-modal .modal-box h2 {
+                font-size: 17px !important;
+            }
+            
+            #cart-items {
+                padding: 8px 12px !important;
+                gap: 8px !important;
+            }
+            
+            #cart-items .flex.items-center.gap-3 {
+                gap: 8px !important;
+            }
+            
+            #cart-items .w-12.h-12 {
+                width: 40px !important;
+                height: 40px !important;
+            }
+            
+            #cart-items .font-black.text-\[12px\] {
+                font-size: 11px !important;
+            }
+            
+            #cart-total {
+                font-size: 20px !important;
+            }
+            
+            #checkout-btn {
+                padding: 12px !important;
+                font-size: 10px !important;
+                border-radius: 10px !important;
+            }
+            
+            #address {
+                padding: 10px 12px !important;
+                font-size: 13px !important;
+                height: 44px !important;
+            }
+            
+            /* Footer */
+            footer {
+                padding: 24px 16px !important;
+                margin-top: 24px !important;
+            }
+            
+            footer h2 {
+                font-size: 18px !important;
+            }
+            
+            footer p {
+                font-size: 12px !important;
+            }
+            
+            /* Botão WhatsApp */
+            .fixed.bottom-6.right-6.w-14.h-14 {
+                width: 48px !important;
+                height: 48px !important;
+                font-size: 22px !important;
+                bottom: 16px !important;
+                right: 16px !important;
+            }
+            
+            /* Botão Quiz */
+            .fixed.bottom-24.right-6 {
+                bottom: 72px !important;
+                right: 16px !important;
+                padding: 10px 14px !important;
+                font-size: 9px !important;
+                border-radius: 12px !important;
+            }
+            
+            .fixed.bottom-24.right-6 i {
+                font-size: 14px !important;
+            }
+            
+            /* Menu mobile */
+            #mobile-menu {
+                width: 85% !important;
+                max-width: 300px !important;
+            }
+            
+            #mobile-menu .p-6 {
+                padding: 16px !important;
+            }
+            
+            #mobile-menu button.w-full {
+                padding: 10px 14px !important;
+                font-size: 13px !important;
+                border-radius: 10px !important;
+            }
+            
+            /* Quiz modal */
+            #quiz-modal .bg-white {
+                border-radius: 20px !important;
+                padding: 20px !important;
+            }
+            
+            #quiz-modal h2 {
+                font-size: 18px !important;
+            }
+            
+            #quiz-modal button.p-5 {
+                padding: 14px !important;
+                border-radius: 12px !important;
+            }
+            
+            #quiz-modal .w-12.h-12 {
+                width: 36px !important;
+                height: 36px !important;
+            }
+            
+            #quiz-modal .w-12.h-12 i {
+                font-size: 14px !important;
+            }
+            
+            /* Install Banner */
+            #install-banner {
+                padding: 12px 16px !important;
+                border-radius: 16px !important;
+                bottom: 16px !important;
+                left: 16px !important;
+                right: 16px !important;
+            }
+            
+            #install-banner .w-12.h-12 {
+                width: 36px !important;
+                height: 36px !important;
+            }
+            
+            #install-banner h4 {
+                font-size: 12px !important;
+            }
+            
+            #install-banner p {
+                font-size: 9px !important;
+            }
+            
+            #install-banner button {
+                font-size: 9px !important;
+                padding: 6px 12px !important;
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVE - TABLET
+           ============================================================ */
+        @media (min-width: 641px) and (max-width: 1024px) {
+            #produtos-container {
+                grid-template-columns: repeat(3, 1fr) !important;
+            }
+            
+            .bg-wr-gradient {
+                padding: 32px 24px !important;
+            }
+            
+            .bg-wr-gradient h2 {
+                font-size: 32px !important;
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVE - DESKTOP PEQUENO
+           ============================================================ */
+        @media (min-width: 1025px) and (max-width: 1280px) {
+            #produtos-container {
+                grid-template-columns: repeat(4, 1fr) !important;
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVE - MOBILE (LOGIN)
+           ============================================================ */
+        @media (max-width: 480px) {
+            .login-container {
+                padding: 30px 20px !important;
+                margin: 12px !important;
+                border-radius: 20px !important;
+            }
+
+            .login-logo img {
+                width: 60px !important;
+                height: 60px !important;
+            }
+
+            .login-logo h1 {
+                font-size: 20px !important;
+            }
+
+            .login-logo p {
+                font-size: 12px !important;
+            }
+
+            .form-group input {
+                padding: 12px 14px !important;
+                font-size: 14px !important;
+            }
+
+            .btn-login {
+                padding: 14px !important;
+                font-size: 15px !important;
+            }
+
+            .login-footer {
+                font-size: 11px !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-logo">
+            <img src="../assets/Logo.png" alt="WR Aromatizantes">
+            <h1>WR Aromatizantes</h1>
+            <p>Painel Administrativo</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email"><i class="fas fa-envelope"></i> E-mail</label>
+                <input type="email" id="email" placeholder="wfcwfc42@gmail.com" required autofocus>
+            </div>
+
+            <div class="form-group">
+                <label for="senha"><i class="fas fa-lock"></i> Senha</label>
+                <div class="senha-toggle">
+                    <input type="password" id="senha" placeholder="Digite sua senha" required>
+                    <button type="button" onclick="toggleSenha()">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-login" id="btnLogin">
+                <i class="fas fa-sign-in-alt"></i> Entrar
+            </button>
+        </form>
+
+        <div class="login-footer">
+            <!-- <p>Credenciais padrão: wfcwfc42@gmail.com / admin123</p> -->
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import { login } from './auth.js';
+
+        const form = document.getElementById('loginForm');
+        const email = document.getElementById('email');
+        const senha = document.getElementById('senha');
+        const alertDiv = document.getElementById('alert');
+        const btnLogin = document.getElementById('btnLogin');
+
+        // Verificar se já está logado
+        if (sessionStorage.getItem('usuario_logado')) {
+            window.location.href = 'dashboard.html';
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            alertDiv.className = 'alert';
+            alertDiv.style.display = 'none';
+            btnLogin.disabled = true;
+            btnLogin.innerHTML = '<span class="spinner"></span> Entrando...';
+
+            try {
+                await login(email.value, senha.value);
+                window.location.href = 'dashboard.html';
+            } catch (error) {
+                alertDiv.className = 'alert alert-error';
+                alertDiv.style.display = 'block';
+                alertDiv.textContent = error.message || 'Erro ao fazer login';
+                btnLogin.disabled = false;
+                btnLogin.innerHTML = '<i class="fas fa-sign-in-alt"></i> Entrar';
+            }
+        });
+
+        window.toggleSenha = function() {
+            const input = document.getElementById('senha');
+            const icon = document.querySelector('.senha-toggle button i');
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.className = 'fas fa-eye-slash';
+            } else {
+                input.type = 'password';
+                icon.className = 'fas fa-eye';
+            }
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Atualizar Email Admin</title>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 600px; margin: 0 auto; }
+        .success { color: green; background: #d1fae5; padding: 15px; border-radius: 8px; }
+        .error { color: red; background: #fee2e2; padding: 15px; border-radius: 8px; }
+        button { padding: 12px 24px; background: #6d28d9; color: white; border: none; border-radius: 8px; cursor: pointer; }
+        pre { background: #f0f0f0; padding: 15px; border-radius: 8px; overflow: auto; }
+    </style>
+</head>
+<body>
+    <h1>📧 Atualizar Email do Admin</h1>
+    <p>Clique no botão abaixo para atualizar o email do administrador.</p>
+    
+    <button onclick="atualizarEmail()">Atualizar para wfcwfc42@gmail.com</button>
+    
+    <div id="resultado"></div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+        
+        const SUPABASE_URL = 'https://pgxkklnskkrnajhbazib.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBneGtrbG5za2tybmFqaGJhemliIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODUwODM5NTksImV4cCI6MjEwMDY1OTk1OX0.rVNJ9XQSAXd80HFfZ_93AvZ889aT2-polSUDPI65qP0';
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        window.atualizarEmail = async function() {
+            const resultado = document.getElementById('resultado');
+            resultado.innerHTML = '🔄 Atualizando...';
+            
+            try {
+                // 1. Verificar se o usuário existe
+                const { data: usuario, error: buscaError } = await supabase
+                    .from('usuarios')
+                    .select('*')
+                    .eq('email', 'admin@wraromatizantes.com')
+                    .maybeSingle();
+                
+                if (buscaError) {
+                    resultado.innerHTML = `<div class="error">❌ Erro na busca: ${buscaError.message}</div>`;
+                    return;
+                }
+                
+                if (!usuario) {
+                    // Criar novo usuário
+                    const { data: novoUsuario, error: criarError } = await supabase
+                        .from('usuarios')
+                        .insert([{
+                            nome: 'Administrador',
+                            email: 'wfcwfc42@gmail.com',
+                            senha_hash: 'admin123',
+                            nivel_acesso: 'administrador',
+                            ativo: true,
+                            created_at: new Date().toISOString()
+                        }])
+                        .select()
+                        .single();
+                    
+                    if (criarError) {
+                        resultado.innerHTML = `<div class="error">❌ Erro ao criar usuário: ${criarError.message}</div>`;
+                        return;
+                    }
+                    
+                    resultado.innerHTML = `
+                        <div class="success">✅ Novo usuário criado com sucesso!</div>
+                        <pre>${JSON.stringify(novoUsuario, null, 2)}</pre>
+                        <p>🔑 Email: wfcwfc42@gmail.com</p>
+                        <p>🔑 Senha: admin123</p>
+                    `;
+                    return;
+                }
+                
+                // 2. Atualizar o email
+                const { data: atualizado, error: updateError } = await supabase
+                    .from('usuarios')
+                    .update({ 
+                        email: 'wfcwfc42@gmail.com',
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', usuario.id)
+                    .select()
+                    .single();
+                
+                if (updateError) {
+                    resultado.innerHTML = `<div class="error">❌ Erro ao atualizar: ${updateError.message}</div>`;
+                    return;
+                }
+                
+                resultado.innerHTML = `
+                    <div class="success">✅ Email atualizado com sucesso!</div>
+                    <pre>${JSON.stringify(atualizado, null, 2)}</pre>
+                    <p>🔑 Novo email: wfcwfc42@gmail.com</p>
+                    <p>🔑 Senha: admin123</p>
+                    <p>🔗 <a href="admin/index.html">Ir para o Login</a></p>
+                `;
+                
+            } catch (err) {
+                resultado.innerHTML = `<div class="error">❌ Erro: ${err.message}</div>`;
+            }
+        };
+    </script>
+</body>
+</html>

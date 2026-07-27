@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produtos - WR Aromatizantes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/admin.css">
+    <link rel="stylesheet" href="../mobile-responsive.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f3ff;
+            display: flex;
+            min-height: 100vh;
+        }
+        /* Sidebar - mesmo estilo do dashboard */
+        .sidebar {
+            width: 280px;
+            background: #1a1a2e;
+            color: white;
+            padding: 30px 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s;
+        }
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 30px;
+        }
+        .sidebar-brand img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+        .sidebar-brand h2 {
+            font-size: 18px;
+            color: #fff;
+        }
+        .sidebar-brand span { color: #8b5cf6; }
+        .sidebar-menu {
+            list-style: none;
+        }
+        .sidebar-menu li { margin-bottom: 5px; }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #a0a0b8;
+            text-decoration: none;
+            border-radius: 10px;
+            transition: all 0.3s;
+            font-size: 14px;
+        }
+        .sidebar-menu a:hover {
+            background: rgba(139, 92, 246, 0.2);
+            color: white;
+        }
+        .sidebar-menu a.active {
+            background: #6d28d9;
+            color: white;
+        }
+        .sidebar-menu a i {
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            right: 20px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        .sidebar-footer button {
+            width: 100%;
+            padding: 12px;
+            background: rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .sidebar-footer button:hover {
+            background: #ef4444;
+            color: white;
+        }
+        .main-content {
+            margin-left: 280px;
+            flex: 1;
+            padding: 30px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .header h1 { font-size: 28px; color: #1a1a2e; }
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header-user .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #6d28d9;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+        .mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: #1a1a2e;
+            cursor: pointer;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        .overlay.active { display: block; }
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .toolbar .search-box {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+            max-width: 400px;
+        }
+        .toolbar .search-box input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 14px;
+        }
+        .toolbar .search-box input:focus {
+            outline: none;
+            border-color: #6d28d9;
+        }
+        .table-container {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th {
+            text-align: left;
+            padding: 12px 15px;
+            background: #f8f7ff;
+            font-size: 12px;
+            text-transform: uppercase;
+            color: #666;
+            font-weight: 700;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .product-img {
+            width: 50px;
+            height: 50px;
+            border-radius: 10px;
+            object-fit: cover;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .status-badge.ativo { background: #d1fae5; color: #065f46; }
+        .status-badge.inativo { background: #fee2e2; color: #991b1b; }
+        .btn-sm {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        .btn-edit { background: #dbeafe; color: #1e40af; }
+        .btn-edit:hover { background: #bfdbfe; }
+        .btn-delete { background: #fee2e2; color: #991b1b; }
+        .btn-delete:hover { background: #fecaca; }
+        .btn-add {
+            padding: 12px 24px;
+            background: #6d28d9;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .btn-add:hover {
+            background: #5b21b6;
+            transform: translateY(-2px);
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #888;
+        }
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.3;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+                z-index: 1000;
+            }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .mobile-toggle { display: block !important; }
+            .toolbar { flex-direction: column; }
+            .toolbar .search-box { max-width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="../assets/Logo.png" alt="WR">
+            <div>
+                <h2>WR <span>Aromatizantes</span></h2>
+                <small style="color:#888;font-size:11px;">Painel Admin</small>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="produtos.html" class="active"><i class="fas fa-box"></i> Produtos</a></li>
+            <li><a href="categorias.html"><i class="fas fa-tags"></i> Categorias</a></li>
+            <li><a href="pedidos.html"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+            <li><a href="clientes.html"><i class="fas fa-users"></i> Clientes</a></li>
+            <li><a href="configuracoes.html"><i class="fas fa-cog"></i> Configurações</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </aside>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <div>
+                <button class="mobile-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Produtos</h1>
+            </div>
+            <div class="header-user">
+                <span id="usuarioNome">Admin</span>
+                <div class="avatar" id="avatarUsuario">A</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Buscar produto...">
+                <button class="btn-add" onclick="buscarProdutos()" style="padding: 10px 20px;">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            <button class="btn-add" onclick="abrirModalProduto()">
+                <i class="fas fa-plus"></i> Novo Produto
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Imagem</th>
+                        <th>Nome</th>
+                        <th>ML</th>
+                        <th>Preço</th>
+                        <th>Estoque</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="produtosTable">
+                    <tr>
+                        <td colspan="7" style="text-align:center;color:#888;">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Produto -->
+    <div class="modal-overlay" id="modalProduto">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalProdutoTitle">Novo Produto</h2>
+                <button class="modal-close" onclick="fecharModal('modalProduto')">&times;</button>
+            </div>
+            <form id="produtoForm">
+                <input type="hidden" id="produtoId">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="produtoNome" required>
+                </div>
+                <div class="form-group">
+                    <label>ML</label>
+                    <input type="text" id="produtoMl" placeholder="Ex: 120ml">
+                </div>
+                <div class="form-group">
+                    <label>Preço</label>
+                    <input type="number" id="produtoPreco" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Categoria</label>
+                    <input type="text" id="produtoCategoria">
+                </div>
+                <div class="form-group">
+                    <label>Estoque</label>
+                    <input type="number" id="produtoSaldo" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Imagem (URL)</label>
+                    <input type="text" id="produtoImagem" placeholder="https://...">
+                </div>
+                <div class="form-group" style="display:flex;gap:20px;">
+                    <label style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="produtoDisponivel" checked> Disponível
+                    </label>
+                    <label style="display:flex;align-items:center;gap:8px;">
+                        <input type="checkbox" id="produtoDestaque"> Destaque
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+        }
+    }
+    </script>
+
+   
+<script type="module">
+  import { supabase, subscribeToTable, unsubscribeFromTable } from '../supabase-config.js';
+  import { getUsuarioLogado, logout, protegerRota } from './auth.js';
+
+
+  let channelProdutos;
+
+  // 🆕 Iniciar escuta em tempo real
+  function iniciarRealtimeProdutos() {
+    channelProdutos = subscribeToTable('produtos', (payload) => {
+      console.log('🔄 Produto atualizado:', payload);
+      carregarProdutos();
+    });
+  }
+
+  // Limpar inscrição ao sair
+  window.addEventListener('beforeunload', () => {
+    if (channelProdutos) unsubscribeFromTable(channelProdutos);
+  });
+
+  // Iniciar após carregar
+  setTimeout(() => {
+    iniciarRealtimeProdutos();
+  }, 1000);
+
+        // Proteger rota
+        if (!protegerRota()) {
+            throw new Error('Acesso negado');
+        }
+
+        // Usuário
+        const usuario = getUsuarioLogado();
+        document.getElementById('usuarioNome').textContent = usuario?.nome || 'Admin';
+        document.getElementById('avatarUsuario').textContent = usuario?.nome?.[0]?.toUpperCase() || 'A';
+
+        // Logout
+        window.logout = logout;
+
+        // Toggle sidebar
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        };
+
+        // Modal
+        window.abrirModalProduto = function(produto = null) {
+            const modal = document.getElementById('modalProduto');
+            modal.classList.add('active');
+            
+            if (produto) {
+                document.getElementById('modalProdutoTitle').textContent = 'Editar Produto';
+                document.getElementById('produtoId').value = produto.id;
+                document.getElementById('produtoNome').value = produto.nome;
+                document.getElementById('produtoMl').value = produto.ml || '';
+                document.getElementById('produtoPreco').value = produto.preco;
+                document.getElementById('produtoCategoria').value = produto.categoria || '';
+                document.getElementById('produtoSaldo').value = produto.saldo || 0;
+                document.getElementById('produtoImagem').value = produto.imagem || '';
+                document.getElementById('produtoDisponivel').checked = produto.disponivel !== false;
+                document.getElementById('produtoDestaque').checked = produto.destaque === true;
+            } else {
+                document.getElementById('modalProdutoTitle').textContent = 'Novo Produto';
+                document.getElementById('produtoId').value = '';
+                document.getElementById('produtoForm').reset();
+                document.getElementById('produtoDisponivel').checked = true;
+                document.getElementById('produtoDestaque').checked = false;
+            }
+        };
+
+        window.fecharModal = function(id) {
+            document.getElementById(id).classList.remove('active');
+        };
+
+        // Carregar produtos
+        async function carregarProdutos() {
+            const tbody = document.getElementById('produtosTable');
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888;">Carregando...</td></tr>';
+
+            try {
+                const { data, error } = await supabase
+                    .from('produtos')
+                    .select('*')
+                    .order('nome');
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="7" style="text-align:center;padding:40px;color:#888;">
+                                <i class="fas fa-box" style="font-size:48px;display:block;margin-bottom:15px;opacity:0.3;"></i>
+                                Nenhum produto cadastrado
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(p => `
+                    <tr>
+                        <td>
+                            <img src="${p.imagem || 'https://placehold.co/50x50/6d28d9/white?text=WR'}" 
+                                 class="product-img" 
+                                 onerror="this.src='https://placehold.co/50x50/6d28d9/white?text=WR'">
+                        </td>
+                        <td><strong>${p.nome}</strong></td>
+                        <td>${p.ml || '-'}</td>
+                        <td>R$ ${(p.preco || 0).toFixed(2).replace('.', ',')}</td>
+                        <td>${p.saldo || 0}</td>
+                        <td>
+                            <span class="status-badge ${p.disponivel !== false ? 'ativo' : 'inativo'}">
+                                ${p.disponivel !== false ? 'Ativo' : 'Inativo'}
+                            </span>
+                        </td>
+                        <td>
+                            <button class="btn-sm btn-edit" onclick="editarProduto('${p.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-sm btn-delete" onclick="excluirProduto('${p.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Erro ao carregar produtos:', error);
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center;color:red;">
+                            Erro ao carregar produtos: ${error.message}
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Editar produto
+        window.editarProduto = async function(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('produtos')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+                abrirModalProduto(data);
+            } catch (error) {
+                console.error('Erro ao buscar produto:', error);
+                alert('Erro ao carregar dados do produto');
+            }
+        };
+
+        // Excluir produto
+        window.excluirProduto = async function(id) {
+            if (!confirm('Tem certeza que deseja excluir este produto?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('produtos')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+                carregarProdutos();
+                showToast('Produto excluído com sucesso!', 'success');
+            } catch (error) {
+                console.error('Erro ao excluir produto:', error);
+                showToast('Erro ao excluir produto', 'error');
+            }
+        };
+
+        // Buscar produtos
+        window.buscarProdutos = async function() {
+            const termo = document.getElementById('searchInput').value.toLowerCase();
+            const tbody = document.getElementById('produtosTable');
+
+            if (!termo) {
+                carregarProdutos();
+                return;
+            }
+
+            try {
+                const { data, error } = await supabase
+                    .from('produtos')
+                    .select('*')
+                    .ilike('nome', `%${termo}%`)
+                    .order('nome');
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888;">Nenhum produto encontrado</td></tr>';
+                    return;
+                }
+
+                tbody.innerHTML = data.map(p => `
+                    <tr>
+                        <td><img src="${p.imagem || 'https://placehold.co/50x50/6d28d9/white?text=WR'}" class="product-img"></td>
+                        <td><strong>${p.nome}</strong></td>
+                        <td>${p.ml || '-'}</td>
+                        <td>R$ ${(p.preco || 0).toFixed(2).replace('.', ',')}</td>
+                        <td>${p.saldo || 0}</td>
+                        <td><span class="status-badge ${p.disponivel !== false ? 'ativo' : 'inativo'}">${p.disponivel !== false ? 'Ativo' : 'Inativo'}</span></td>
+                        <td>
+                            <button class="btn-sm btn-edit" onclick="editarProduto('${p.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-sm btn-delete" onclick="excluirProduto('${p.id}')"><i class="fas fa-trash"></i></button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Erro na busca:', error);
+            }
+        };
+
+        // Salvar produto
+        document.getElementById('produtoForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('produtoId').value;
+            const produto = {
+                nome: document.getElementById('produtoNome').value,
+                ml: document.getElementById('produtoMl').value,
+                preco: parseFloat(document.getElementById('produtoPreco').value),
+                categoria: document.getElementById('produtoCategoria').value,
+                imagem: document.getElementById('produtoImagem').value,
+                saldo: parseInt(document.getElementById('produtoSaldo').value) || 0,
+                disponivel: document.getElementById('produtoDisponivel').checked,
+                destaque: document.getElementById('produtoDestaque').checked,
+            };
+
+            try {
+                let result;
+                if (id) {
+                    result = await supabase
+                        .from('produtos')
+                        .update(produto)
+                        .eq('id', id);
+                } else {
+                    result = await supabase
+                        .from('produtos')
+                        .insert([produto]);
+                }
+
+                if (result.error) throw result.error;
+
+                fecharModal('modalProduto');
+                carregarProdutos();
+                showToast(id ? 'Produto atualizado!' : 'Produto criado!', 'success');
+            } catch (error) {
+                console.error('Erro ao salvar:', error);
+                showToast('Erro ao salvar produto', 'error');
+            }
+        });
+
+        // Toast
+        function showToast(message, type = 'info') {
+            const colors = {
+                success: '#059669',
+                error: '#dc2626',
+                info: '#2563eb',
+                warning: '#d97706'
+            };
+            
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${colors[type] || '#6d28d9'};
+                color: white;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 99999;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                max-width: 400px;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        // Carregar dados iniciais
+        carregarProdutos();
+
+        // Enter para buscar
+        document.getElementById('searchInput').addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') buscarProdutos();
+        });
+    </script>
+</body>
+</html>

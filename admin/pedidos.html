@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - WR Aromatizantes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/admin.css">
+    <link rel="stylesheet" href="../mobile-responsive.css">
+    <style>
+        /* Mesmo estilo base */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f3ff; display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: #1a1a2e; color: white; padding: 30px 20px; position: fixed; height: 100vh; overflow-y: auto; transition: all 0.3s; }
+        .sidebar-brand { display: flex; align-items: center; gap: 15px; padding-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
+        .sidebar-brand img { width: 50px; height: 50px; border-radius: 50%; }
+        .sidebar-brand h2 { font-size: 18px; color: #fff; }
+        .sidebar-brand span { color: #8b5cf6; }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 5px; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a0a0b8; text-decoration: none; border-radius: 10px; transition: all 0.3s; font-size: 14px; }
+        .sidebar-menu a:hover { background: rgba(139, 92, 246, 0.2); color: white; }
+        .sidebar-menu a.active { background: #6d28d9; color: white; }
+        .sidebar-menu a i { width: 20px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 20px; left: 20px; right: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer button { width: 100%; padding: 12px; background: rgba(239, 68, 68, 0.2); color: #ef4444; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .sidebar-footer button:hover { background: #ef4444; color: white; }
+        .main-content { margin-left: 280px; flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 28px; color: #1a1a2e; }
+        .header-user { display: flex; align-items: center; gap: 15px; }
+        .header-user .avatar { width: 45px; height: 45px; border-radius: 50%; background: #6d28d9; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+        .mobile-toggle { display: none; background: none; border: none; font-size: 24px; color: #1a1a2e; cursor: pointer; }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .overlay.active { display: block; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .toolbar select, .toolbar input { padding: 10px 16px; border: 2px solid #e5e7eb; border-radius: 10px; font-size: 14px; }
+        .table-container { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 15px; background: #f8f7ff; font-size: 12px; text-transform: uppercase; color: #666; font-weight: 700; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; }
+        .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }
+        .status-badge.Aguardando { background: #fef3c7; color: #92400e; }
+        .status-badge.Preparo { background: #dbeafe; color: #1e40af; }
+        .status-badge.Entrega { background: #e0e7ff; color: #3730a3; }
+        .status-badge.Entregue { background: #d1fae5; color: #065f46; }
+        .status-badge.Cancelado { background: #fee2e2; color: #991b1b; }
+        .btn-sm { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
+        .btn-status { background: #dbeafe; color: #1e40af; }
+        .btn-status:hover { background: #bfdbfe; }
+        .btn-cancel { background: #fee2e2; color: #991b1b; }
+        .btn-cancel:hover { background: #fecaca; }
+        .btn-details { background: #f3e8ff; color: #6d28d9; }
+        .btn-details:hover { background: #ede9fe; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; z-index: 1000; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .mobile-toggle { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="../assets/Logo.png" alt="WR">
+            <div>
+                <h2>WR <span>Aromatizantes</span></h2>
+                <small style="color:#888;font-size:11px;">Painel Admin</small>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+            <li><a href="categorias.html"><i class="fas fa-tags"></i> Categorias</a></li>
+            <li><a href="pedidos.html" class="active"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+            <li><a href="clientes.html"><i class="fas fa-users"></i> Clientes</a></li>
+            <li><a href="configuracoes.html"><i class="fas fa-cog"></i> Configurações</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </aside>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <div>
+                <button class="mobile-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Pedidos</h1>
+            </div>
+            <div class="header-user">
+                <span id="usuarioNome">Admin</span>
+                <div class="avatar" id="avatarUsuario">A</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+                <select id="filtroStatus">
+                    <option value="">Todos os status</option>
+                    <option value="Aguardando">Aguardando</option>
+                    <option value="Preparo">Em Preparo</option>
+                    <option value="Entrega">Em Entrega</option>
+                    <option value="Entregue">Entregue</option>
+                    <option value="Cancelado">Cancelado</option>
+                </select>
+                <input type="date" id="filtroDataInicio">
+                <input type="date" id="filtroDataFim">
+                <button class="btn-add" onclick="aplicarFiltros()" style="padding:10px 20px;">
+                    <i class="fas fa-filter"></i> Filtrar
+                </button>
+                <button class="btn-add" onclick="carregarPedidos()" style="padding:10px 20px;background:#059669;">
+                    <i class="fas fa-sync"></i> Atualizar
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th># Pedido</th>
+                        <th>Cliente</th>
+                        <th>Total</th>
+                        <th>Status</th>
+                        <th>Data</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="pedidosTable">
+                    <tr>
+                        <td colspan="6" style="text-align:center;color:#888;">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Detalhes -->
+    <div class="modal-overlay" id="modalDetalhes">
+        <div class="modal" style="max-width:700px;">
+            <div class="modal-header">
+                <h2>Detalhes do Pedido</h2>
+                <button class="modal-close" onclick="fecharModal('modalDetalhes')">&times;</button>
+            </div>
+            <div id="detalhesContent"></div>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+        }
+    }
+    </script>
+
+    <script type="module">
+         import { supabase, subscribeToTable, unsubscribeFromTable } from '../supabase-config.js';
+        import { getUsuarioLogado, logout, protegerRota } from './auth.js';
+       
+ let channelPedidos;
+
+  // 🆕 Iniciar escuta em tempo real
+  function iniciarRealtimePedidos() {
+    channelPedidos = subscribeToTable('pedidos', (payload) => {
+      console.log('🔄 Pedido atualizado:', payload);
+      carregarPedidos();
+    });
+  }
+
+  // Limpar inscrição ao sair
+  window.addEventListener('beforeunload', () => {
+    if (channelPedidos) unsubscribeFromTable(channelPedidos);
+  });
+
+  // Iniciar após carregar
+  setTimeout(() => {
+    iniciarRealtimePedidos();
+  }, 1000);
+
+        if (!protegerRota()) throw new Error('Acesso negado');
+
+        const usuario = getUsuarioLogado();
+        document.getElementById('usuarioNome').textContent = usuario?.nome || 'Admin';
+        document.getElementById('avatarUsuario').textContent = usuario?.nome?.[0]?.toUpperCase() || 'A';
+
+        window.logout = logout;
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        };
+
+        window.fecharModal = function(id) {
+            document.getElementById(id).classList.remove('active');
+        };
+
+        window.carregarPedidos = async function() {
+            const tbody = document.getElementById('pedidosTable');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#888;">Carregando...</td></tr>';
+
+            try {
+                const { data, error } = await supabase
+                    .from('pedidos')
+                    .select('*')
+                    .order('criado_em', { ascending: false });
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" style="text-align:center;padding:40px;color:#888;">
+                                <i class="fas fa-shopping-cart" style="font-size:48px;display:block;margin-bottom:15px;opacity:0.3;"></i>
+                                Nenhum pedido encontrado
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(p => `
+                    <tr>
+                        <td><strong>#${p.numero_pedido}</strong></td>
+                        <td>${p.cliente_nome || 'Não identificado'}</td>
+                        <td>R$ ${(p.valor_total || 0).toFixed(2).replace('.', ',')}</td>
+                        <td><span class="status-badge ${p.status}">${p.status}</span></td>
+                        <td>${new Date(p.criado_em).toLocaleDateString('pt-BR')}</td>
+                        <td>
+                            <button class="btn-sm btn-details" onclick="verDetalhes('${p.id}')">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn-sm btn-status" onclick="mudarStatus('${p.id}', '${p.status}')">
+                                <i class="fas fa-arrow-right"></i>
+                            </button>
+                            ${p.status !== 'Cancelado' && p.status !== 'Entregue' ? `
+                                <button class="btn-sm btn-cancel" onclick="cancelarPedido('${p.id}')">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Erro ao carregar pedidos:', error);
+                tbody.innerHTML = `<tr><td colspan="6" style="text-align:center;color:red;">Erro: ${error.message}</td></tr>`;
+            }
+        };
+
+        window.aplicarFiltros = function() {
+            carregarPedidos(); // Simples - pode ser expandido
+        };
+
+        window.verDetalhes = async function(id) {
+            const modal = document.getElementById('modalDetalhes');
+            modal.classList.add('active');
+            
+            const content = document.getElementById('detalhesContent');
+            content.innerHTML = 'Carregando...';
+
+            try {
+                const { data: pedido, error } = await supabase
+                    .from('pedidos')
+                    .select('*, itens_pedido(*)')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+
+                content.innerHTML = `
+                    <div style="margin-bottom:20px;">
+                        <p><strong>Pedido:</strong> #${pedido.numero_pedido}</p>
+                        <p><strong>Cliente:</strong> ${pedido.cliente_nome || 'Não identificado'}</p>
+                        <p><strong>Telefone:</strong> ${pedido.cliente_telefone || '-'}</p>
+                        <p><strong>Status:</strong> <span class="status-badge ${pedido.status}">${pedido.status}</span></p>
+                        <p><strong>Data:</strong> ${new Date(pedido.criado_em).toLocaleString('pt-BR')}</p>
+                        <p><strong>Endereço:</strong> ${pedido.endereco_entrega || '-'}</p>
+                    </div>
+                    <hr style="margin:15px 0;">
+                    <h3>Itens</h3>
+                    ${pedido.itens_pedido?.map(item => `
+                        <div style="display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+                            <span>${item.quantidade}x Produto #${item.produto_id}</span>
+                            <span>R$ ${(item.subtotal || 0).toFixed(2).replace('.', ',')}</span>
+                        </div>
+                    `).join('') || '<p>Sem itens</p>'}
+                    <hr style="margin:15px 0;">
+                    <div style="display:flex;justify-content:space-between;font-size:18px;font-weight:bold;">
+                        <span>Total</span>
+                        <span>R$ ${(pedido.valor_total || 0).toFixed(2).replace('.', ',')}</span>
+                    </div>
+                `;
+
+            } catch (error) {
+                content.innerHTML = `<p style="color:red;">Erro ao carregar detalhes: ${error.message}</p>`;
+            }
+        };
+
+        window.mudarStatus = async function(id, statusAtual) {
+            const statuses = ['Aguardando', 'Preparo', 'Entrega', 'Entregue'];
+            const idx = statuses.indexOf(statusAtual);
+            const proxStatus = statuses[idx + 1];
+            
+            if (!proxStatus) {
+                showToast('Pedido já está no status final!', 'warning');
+                return;
+            }
+
+            if (!confirm(`Alterar status para "${proxStatus}"?`)) return;
+
+            try {
+                const { error } = await supabase
+                    .from('pedidos')
+                    .update({ status: proxStatus, atualizado_em: new Date().toISOString() })
+                    .eq('id', id);
+
+                if (error) throw error;
+                carregarPedidos();
+                showToast(`Status alterado para ${proxStatus}!`, 'success');
+            } catch (error) {
+                console.error('Erro ao mudar status:', error);
+                showToast('Erro ao mudar status', 'error');
+            }
+        };
+
+        window.cancelarPedido = async function(id) {
+            if (!confirm('Tem certeza que deseja cancelar este pedido?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('pedidos')
+                    .update({ status: 'Cancelado', atualizado_em: new Date().toISOString() })
+                    .eq('id', id);
+
+                if (error) throw error;
+                carregarPedidos();
+                showToast('Pedido cancelado!', 'success');
+            } catch (error) {
+                console.error('Erro ao cancelar pedido:', error);
+                showToast('Erro ao cancelar pedido', 'error');
+            }
+        };
+
+        function showToast(message, type = 'info') {
+            const colors = { success: '#059669', error: '#dc2626', info: '#2563eb', warning: '#d97706' };
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${colors[type] || '#6d28d9'};
+                color: white;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 99999;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                max-width: 400px;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        carregarPedidos();
+    </script>
+</body>
+</html>

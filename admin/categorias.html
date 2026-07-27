@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categorias - WR Aromatizantes</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="assets/admin.css">
+   
+<link rel="stylesheet" href="../mobile-responsive.css">
+    <style>
+        /* Mesmo estilo do produtos.html */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f3ff; display: flex; min-height: 100vh; }
+        .sidebar { width: 280px; background: #1a1a2e; color: white; padding: 30px 20px; position: fixed; height: 100vh; overflow-y: auto; transition: all 0.3s; }
+        .sidebar-brand { display: flex; align-items: center; gap: 15px; padding-bottom: 30px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 30px; }
+        .sidebar-brand img { width: 50px; height: 50px; border-radius: 50%; }
+        .sidebar-brand h2 { font-size: 18px; color: #fff; }
+        .sidebar-brand span { color: #8b5cf6; }
+        .sidebar-menu { list-style: none; }
+        .sidebar-menu li { margin-bottom: 5px; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 16px; color: #a0a0b8; text-decoration: none; border-radius: 10px; transition: all 0.3s; font-size: 14px; }
+        .sidebar-menu a:hover { background: rgba(139, 92, 246, 0.2); color: white; }
+        .sidebar-menu a.active { background: #6d28d9; color: white; }
+        .sidebar-menu a i { width: 20px; text-align: center; }
+        .sidebar-footer { position: absolute; bottom: 20px; left: 20px; right: 20px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-footer button { width: 100%; padding: 12px; background: rgba(239, 68, 68, 0.2); color: #ef4444; border: none; border-radius: 10px; cursor: pointer; font-weight: 600; transition: all 0.3s; }
+        .sidebar-footer button:hover { background: #ef4444; color: white; }
+        .main-content { margin-left: 280px; flex: 1; padding: 30px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+        .header h1 { font-size: 28px; color: #1a1a2e; }
+        .header-user { display: flex; align-items: center; gap: 15px; }
+        .header-user .avatar { width: 45px; height: 45px; border-radius: 50%; background: #6d28d9; color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; }
+        .mobile-toggle { display: none; background: none; border: none; font-size: 24px; color: #1a1a2e; cursor: pointer; }
+        .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999; }
+        .overlay.active { display: block; }
+        .toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 10px; }
+        .btn-add { padding: 12px 24px; background: #6d28d9; color: white; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s; }
+        .btn-add:hover { background: #5b21b6; transform: translateY(-2px); }
+        .table-container { background: white; border-radius: 16px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 12px 15px; background: #f8f7ff; font-size: 12px; text-transform: uppercase; color: #666; font-weight: 700; }
+        td { padding: 12px 15px; border-bottom: 1px solid #f0f0f0; }
+        .btn-sm { padding: 6px 12px; border: none; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; }
+        .btn-edit { background: #dbeafe; color: #1e40af; }
+        .btn-edit:hover { background: #bfdbfe; }
+        .btn-delete { background: #fee2e2; color: #991b1b; }
+        .btn-delete:hover { background: #fecaca; }
+        .color-preview { width: 30px; height: 30px; border-radius: 50%; display: inline-block; border: 2px solid #e5e7eb; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); width: 280px; z-index: 1000; }
+            .sidebar.active { transform: translateX(0); }
+            .main-content { margin-left: 0; padding: 20px; }
+            .mobile-toggle { display: block !important; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <img src="../assets/Logo.png" alt="WR">
+            <div>
+                <h2>WR <span>Aromatizantes</span></h2>
+                <small style="color:#888;font-size:11px;">Painel Admin</small>
+            </div>
+        </div>
+        <ul class="sidebar-menu">
+            <li><a href="dashboard.html"><i class="fas fa-chart-pie"></i> Dashboard</a></li>
+            <li><a href="produtos.html"><i class="fas fa-box"></i> Produtos</a></li>
+            <li><a href="categorias.html" class="active"><i class="fas fa-tags"></i> Categorias</a></li>
+            <li><a href="pedidos.html"><i class="fas fa-shopping-cart"></i> Pedidos</a></li>
+            <li><a href="clientes.html"><i class="fas fa-users"></i> Clientes</a></li>
+            <li><a href="configuracoes.html"><i class="fas fa-cog"></i> Configurações</a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <button onclick="logout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+        </div>
+    </aside>
+
+    <div class="overlay" id="overlay" onclick="toggleSidebar()"></div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="header">
+            <div>
+                <button class="mobile-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Categorias</h1>
+            </div>
+            <div class="header-user">
+                <span id="usuarioNome">Admin</span>
+                <div class="avatar" id="avatarUsuario">A</div>
+            </div>
+        </div>
+
+        <div class="toolbar">
+            <button class="btn-add" onclick="abrirModalCategoria()">
+                <i class="fas fa-plus"></i> Nova Categoria
+            </button>
+        </div>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Ícone</th>
+                        <th>Cor</th>
+                        <th>Ordem</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody id="categoriasTable">
+                    <tr>
+                        <td colspan="5" style="text-align:center;color:#888;">Carregando...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <!-- Modal Categoria -->
+    <div class="modal-overlay" id="modalCategoria">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modalCategoriaTitle">Nova Categoria</h2>
+                <button class="modal-close" onclick="fecharModal('modalCategoria')">&times;</button>
+            </div>
+            <form id="categoriaForm">
+                <input type="hidden" id="categoriaId">
+                <div class="form-group">
+                    <label>Nome</label>
+                    <input type="text" id="categoriaNome" required>
+                </div>
+                <div class="form-group">
+                    <label>Ícone (Font Awesome)</label>
+                    <input type="text" id="categoriaIcone" placeholder="fa-solid fa-tag">
+                </div>
+                <div class="form-group">
+                    <label>Cor</label>
+                    <input type="color" id="categoriaCor" value="#6d28d9">
+                </div>
+                <div class="form-group">
+                    <label>Ordem</label>
+                    <input type="number" id="categoriaOrdem" value="0">
+                </div>
+                <button type="submit" class="btn btn-primary" style="width:100%;">
+                    <i class="fas fa-save"></i> Salvar
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script type="importmap">
+    {
+        "imports": {
+            "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm": "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm"
+        }
+    }
+    </script>
+
+    <script type="module">
+        import { getUsuarioLogado, logout, protegerRota } from './auth.js';
+        import { supabase } from '../supabase-config.js';
+
+        if (!protegerRota()) throw new Error('Acesso negado');
+
+        const usuario = getUsuarioLogado();
+        document.getElementById('usuarioNome').textContent = usuario?.nome || 'Admin';
+        document.getElementById('avatarUsuario').textContent = usuario?.nome?.[0]?.toUpperCase() || 'A';
+
+        window.logout = logout;
+        window.toggleSidebar = function() {
+            document.getElementById('sidebar').classList.toggle('active');
+            document.getElementById('overlay').classList.toggle('active');
+        };
+
+        window.abrirModalCategoria = function(categoria = null) {
+            const modal = document.getElementById('modalCategoria');
+            modal.classList.add('active');
+            
+            if (categoria) {
+                document.getElementById('modalCategoriaTitle').textContent = 'Editar Categoria';
+                document.getElementById('categoriaId').value = categoria.id;
+                document.getElementById('categoriaNome').value = categoria.nome;
+                document.getElementById('categoriaIcone').value = categoria.icone || '';
+                document.getElementById('categoriaCor').value = categoria.cor || '#6d28d9';
+                document.getElementById('categoriaOrdem').value = categoria.ordem || 0;
+            } else {
+                document.getElementById('modalCategoriaTitle').textContent = 'Nova Categoria';
+                document.getElementById('categoriaId').value = '';
+                document.getElementById('categoriaForm').reset();
+                document.getElementById('categoriaCor').value = '#6d28d9';
+            }
+        };
+
+        window.fecharModal = function(id) {
+            document.getElementById(id).classList.remove('active');
+        };
+
+        async function carregarCategorias() {
+            const tbody = document.getElementById('categoriasTable');
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Carregando...</td></tr>';
+
+            try {
+                const { data, error } = await supabase
+                    .from('categorias')
+                    .select('*')
+                    .order('ordem');
+
+                if (error) throw error;
+
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="5" style="text-align:center;padding:40px;color:#888;">
+                                <i class="fas fa-tags" style="font-size:48px;display:block;margin-bottom:15px;opacity:0.3;"></i>
+                                Nenhuma categoria cadastrada
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                tbody.innerHTML = data.map(c => `
+                    <tr>
+                        <td><strong>${c.nome}</strong></td>
+                        <td><i class="${c.icone || 'fa-solid fa-tag'}"></i></td>
+                        <td><span class="color-preview" style="background:${c.cor || '#6d28d9'}"></span></td>
+                        <td>${c.ordem || 0}</td>
+                        <td>
+                            <button class="btn-sm btn-edit" onclick="editarCategoria('${c.id}')">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-sm btn-delete" onclick="excluirCategoria('${c.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Erro ao carregar categorias:', error);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">Erro: ${error.message}</td></tr>`;
+            }
+        }
+
+        window.editarCategoria = async function(id) {
+            try {
+                const { data, error } = await supabase
+                    .from('categorias')
+                    .select('*')
+                    .eq('id', id)
+                    .single();
+
+                if (error) throw error;
+                abrirModalCategoria(data);
+            } catch (error) {
+                console.error('Erro ao buscar categoria:', error);
+                alert('Erro ao carregar dados da categoria');
+            }
+        };
+
+        window.excluirCategoria = async function(id) {
+            if (!confirm('Tem certeza que deseja excluir esta categoria?')) return;
+
+            try {
+                const { error } = await supabase
+                    .from('categorias')
+                    .delete()
+                    .eq('id', id);
+
+                if (error) throw error;
+                carregarCategorias();
+                showToast('Categoria excluída!', 'success');
+            } catch (error) {
+                console.error('Erro ao excluir:', error);
+                showToast('Erro ao excluir categoria', 'error');
+            }
+        };
+
+        document.getElementById('categoriaForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const id = document.getElementById('categoriaId').value;
+            const categoria = {
+                nome: document.getElementById('categoriaNome').value,
+                icone: document.getElementById('categoriaIcone').value,
+                cor: document.getElementById('categoriaCor').value,
+                ordem: parseInt(document.getElementById('categoriaOrdem').value) || 0,
+            };
+
+            try {
+                let result;
+                if (id) {
+                    result = await supabase
+                        .from('categorias')
+                        .update(categoria)
+                        .eq('id', id);
+                } else {
+                    result = await supabase
+                        .from('categorias')
+                        .insert([categoria]);
+                }
+
+                if (result.error) throw result.error;
+
+                fecharModal('modalCategoria');
+                carregarCategorias();
+                showToast(id ? 'Categoria atualizada!' : 'Categoria criada!', 'success');
+            } catch (error) {
+                console.error('Erro ao salvar:', error);
+                showToast('Erro ao salvar categoria', 'error');
+            }
+        });
+
+        function showToast(message, type = 'info') {
+            const colors = { success: '#059669', error: '#dc2626', info: '#2563eb' };
+            const toast = document.createElement('div');
+            toast.textContent = message;
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                background: ${colors[type] || '#6d28d9'};
+                color: white;
+                border-radius: 12px;
+                font-weight: 600;
+                z-index: 99999;
+                animation: slideIn 0.3s ease;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+                max-width: 400px;
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        carregarCategorias();
+    </script>
+</body>
+</html>
